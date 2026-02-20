@@ -5,7 +5,7 @@ import { PROVINCES } from "@/lib/provinces";
 import { Card, CardContent } from "@/components/ui/card";
 import AdPlaceholder from "@/components/AdPlaceholder";
 import { supabase } from "@/integrations/supabase/client";
-import SaunaMap from "@/components/SaunaMap";
+import SafeSaunaMap from "@/components/SafeSaunaMap";
 
 const ProvinciePage = () => {
   const { provincie } = useParams<{ provincie: string }>();
@@ -76,7 +76,7 @@ const ProvinciePage = () => {
       {saunasForMap && saunasForMap.length > 0 && (
         <div className="mb-8">
           <h2 className="mb-3 font-serif text-xl font-semibold">Kaart</h2>
-          <SaunaMap saunas={saunasForMap} height="350px" />
+          <SafeSaunaMap saunas={saunasForMap} height="350px" />
         </div>
       )}
 
