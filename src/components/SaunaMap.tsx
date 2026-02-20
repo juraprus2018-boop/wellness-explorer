@@ -1,9 +1,26 @@
-import { useMemo } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useEffect, useRef, useMemo } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Custom modern marker SVG
+interface SaunaMapItem {
+  id: string;
+  name: string;
+  slug: string;
+  plaatsnaam: string;
+  plaatsnaam_slug: string;
+  provincie_slug: string;
+  lat: number | null;
+  lng: number | null;
+  average_rating: number | null;
+  review_count: number | null;
+}
+
+interface SaunaMapProps {
+  saunas: SaunaMapItem[];
+  height?: string;
+  className?: string;
+}
+
 const createCustomIcon = (color = "hsl(174, 60%, 40%)") => {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 42" width="32" height="42">
     <defs>
@@ -27,26 +44,10 @@ const createCustomIcon = (color = "hsl(174, 60%, 40%)") => {
 
 const markerIcon = createCustomIcon();
 
-interface SaunaMapItem {
-  id: string;
-  name: string;
-  slug: string;
-  plaatsnaam: string;
-  plaatsnaam_slug: string;
-  provincie_slug: string;
-  lat: number | null;
-  lng: number | null;
-  average_rating: number | null;
-  review_count: number | null;
-}
-
-interface SaunaMapProps {
-  saunas: SaunaMapItem[];
-  height?: string;
-  className?: string;
-}
-
 const SaunaMap = ({ saunas, height = "400px", className = "" }: SaunaMapProps) => {
+  const mapRef = useRef<L.Map | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const mappable = useMemo(
     () => saunas.filter((s) => s.lat != null && s.lng != null),
     [saunas]
@@ -65,35 +66,59 @@ const SaunaMap = ({ saunas, height = "400px", className = "" }: SaunaMapProps) =
     return 9;
   }, [mappable]);
 
+  useEffect(() => {
+    if (!containerRef.current || mappable.length === 0) return;
+
+    // Clean up existing map
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+    }
+
+    const map = L.map(containerRef.current).setView(center, zoom);
+    mapRef.current = map;
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(map);
+
+    mappable.forEach((sauna) => {
+      const ratingHtml =
+        sauna.average_rating != null && Number(sauna.average_rating) > 0
+          ? `<p class="text-xs mb-2">⭐ ${Number(sauna.average_rating).toFixed(1)} (${sauna.review_count} reviews)</p>`
+          : "";
+
+      const popupContent = `
+        <div style="min-width:180px">
+          <p style="font-weight:600;font-size:14px;margin:0 0 4px">${sauna.name}</p>
+          <p style="font-size:12px;color:#666;margin:0 0 4px">${sauna.plaatsnaam}</p>
+          ${ratingHtml}
+          <a href="/sauna/${sauna.provincie_slug}/${sauna.plaatsnaam_slug}/${sauna.slug}" style="font-size:12px;color:hsl(174,60%,40%)">Bekijk details →</a>
+        </div>
+      `;
+
+      L.marker([sauna.lat!, sauna.lng!], { icon: markerIcon })
+        .addTo(map)
+        .bindPopup(popupContent);
+    });
+
+    // Force a resize after mount
+    setTimeout(() => map.invalidateSize(), 100);
+
+    return () => {
+      map.remove();
+      mapRef.current = null;
+    };
+  }, [mappable, center, zoom]);
+
   if (mappable.length === 0) return null;
 
   return (
-    <div className={`overflow-hidden rounded-lg border border-border ${className}`} style={{ height }}>
-      <MapContainer center={center} zoom={zoom} style={{ height: "100%", width: "100%" }} scrollWheelZoom={true}>
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {mappable.map((sauna) => (
-          <Marker key={sauna.id} position={[sauna.lat!, sauna.lng!]} icon={markerIcon}>
-            <Popup>
-              <div className="min-w-[180px]">
-                <p className="font-semibold text-sm mb-1">{sauna.name}</p>
-                <p className="text-xs text-muted-foreground mb-1">{sauna.plaatsnaam}</p>
-                {sauna.average_rating != null && Number(sauna.average_rating) > 0 && (
-                  <p className="text-xs mb-2">⭐ {Number(sauna.average_rating).toFixed(1)} ({sauna.review_count} reviews)</p>
-                )}
-                <a
-                  href={`/sauna/${sauna.provincie_slug}/${sauna.plaatsnaam_slug}/${sauna.slug}`}
-                  className="text-xs text-primary hover:underline"
-                >
-                  Bekijk details →
-                </a>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+    <div
+      className={`overflow-hidden rounded-lg border border-border ${className}`}
+      style={{ height }}
+    >
+      <div ref={containerRef} style={{ height: "100%", width: "100%" }} />
     </div>
   );
 };
