@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PROVINCES } from "@/lib/provinces";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AdPlaceholder from "@/components/AdPlaceholder";
-import SaunaMap from "@/components/SaunaMap";
+import SafeSaunaMap from "@/components/SafeSaunaMap";
 
 const KaartPage = () => {
   const [selectedProvince, setSelectedProvince] = useState<string>("alle");
@@ -58,7 +58,7 @@ const KaartPage = () => {
 
       <AdPlaceholder className="mb-6" />
 
-      <SaunaMap saunas={filteredSaunas} height="70vh" />
+      <SafeSaunaMap saunas={filteredSaunas} height="70vh" />
     </div>
   );
 };
