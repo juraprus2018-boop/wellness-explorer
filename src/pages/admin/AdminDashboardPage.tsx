@@ -2,14 +2,29 @@ import { Link } from "react-router-dom";
 import { Plus, List, Trophy, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminDashboardPage = () => {
+  const { signOut } = useAuth();
+
+  const { data: saunaCount = 0 } = useQuery({
+    queryKey: ["admin-sauna-count"],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("saunas")
+        .select("*", { count: "exact", head: true });
+      return count ?? 0;
+    },
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="container flex h-14 items-center justify-between">
           <h1 className="font-serif text-lg font-bold">Admin Dashboard</h1>
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={signOut}>
             <LogOut className="mr-2 h-4 w-4" /> Uitloggen
           </Button>
         </div>
@@ -35,7 +50,7 @@ const AdminDashboardPage = () => {
               <CardTitle className="font-serif">Alle sauna's</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">0 sauna's</p>
+              <p className="text-sm text-muted-foreground">{saunaCount} sauna's</p>
             </CardContent>
           </Card>
           <Link to="/admin/top-10">

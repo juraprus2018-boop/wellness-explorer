@@ -3,7 +3,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./hooks/useAuth";
 import Layout from "./components/Layout";
+import AdminGuard from "./components/AdminGuard";
 import Index from "./pages/Index";
 import ProvinciePage from "./pages/ProvinciePage";
 import PlaatsPage from "./pages/PlaatsPage";
@@ -20,31 +22,33 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Public routes with header/footer */}
-          <Route element={<Layout />}>
-            <Route path="/" element={<Index />} />
-            <Route path="/sauna/:provincie" element={<ProvinciePage />} />
-            <Route path="/sauna/:provincie/:plaatsnaam" element={<PlaatsPage />} />
-            <Route path="/sauna/:provincie/:plaatsnaam/:slug" element={<SaunaDetailPage />} />
-            <Route path="/de-beste-saunas-van-nederland" element={<Top10Page />} />
-            <Route path="/kaart" element={<KaartPage />} />
-          </Route>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            {/* Public routes with header/footer */}
+            <Route element={<Layout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/sauna/:provincie" element={<ProvinciePage />} />
+              <Route path="/sauna/:provincie/:plaatsnaam" element={<PlaatsPage />} />
+              <Route path="/sauna/:provincie/:plaatsnaam/:slug" element={<SaunaDetailPage />} />
+              <Route path="/de-beste-saunas-van-nederland" element={<Top10Page />} />
+              <Route path="/kaart" element={<KaartPage />} />
+            </Route>
 
-          {/* Admin routes (no public header/footer) */}
-          <Route path="/admin/login" element={<AdminLoginPage />} />
-          <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-          <Route path="/admin/saunas/toevoegen" element={<AdminAddSaunaPage />} />
-          <Route path="/admin/top-10" element={<AdminTop10Page />} />
+            {/* Admin routes */}
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboardPage /></AdminGuard>} />
+            <Route path="/admin/saunas/toevoegen" element={<AdminGuard><AdminAddSaunaPage /></AdminGuard>} />
+            <Route path="/admin/top-10" element={<AdminGuard><AdminTop10Page /></AdminGuard>} />
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
