@@ -17,6 +17,7 @@ import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminAddSaunaPage from "./pages/admin/AdminAddSaunaPage";
 import AdminTop10Page from "./pages/admin/AdminTop10Page";
 import NotFound from "./pages/NotFound";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             {/* Public routes with header/footer */}
             <Route element={<Layout />}>

@@ -1,10 +1,12 @@
 import { useParams, Link } from "react-router-dom";
+import { useMemo } from "react";
 import { MapPin, Star, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import AdPlaceholder from "@/components/AdPlaceholder";
 import { supabase } from "@/integrations/supabase/client";
 import { PROVINCES } from "@/lib/provinces";
+import SaunaMap from "@/components/SaunaMap";
 
 const PlaatsPage = () => {
   const { provincie, plaatsnaam } = useParams<{ provincie: string; plaatsnaam: string }>();
@@ -15,7 +17,7 @@ const PlaatsPage = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("saunas")
-        .select("id, name, slug, address, average_rating, review_count, photo_urls, plaatsnaam")
+        .select("id, name, slug, address, average_rating, review_count, photo_urls, plaatsnaam, plaatsnaam_slug, provincie_slug, lat, lng")
         .eq("provincie_slug", provincie!)
         .eq("plaatsnaam_slug", plaatsnaam!)
         .order("name");
@@ -25,6 +27,11 @@ const PlaatsPage = () => {
   });
 
   const displayPlaats = saunas?.[0]?.plaatsnaam || plaatsnaam;
+
+  const saunasForMap = useMemo(() => {
+    if (!saunas) return [];
+    return saunas.filter((s) => s.lat != null && s.lng != null);
+  }, [saunas]);
 
   return (
     <div className="container py-10">
@@ -42,6 +49,13 @@ const PlaatsPage = () => {
       </p>
 
       <AdPlaceholder className="mb-8" />
+
+      {saunasForMap.length > 0 && (
+        <div className="mb-8">
+          <h2 className="mb-3 font-serif text-xl font-semibold">Kaart</h2>
+          <SaunaMap saunas={saunasForMap} height="300px" />
+        </div>
+      )}
 
       {isLoading ? (
         <div className="flex justify-center py-12">
