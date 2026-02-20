@@ -12,7 +12,7 @@ const Footer = () => (
             <span className="font-serif text-lg font-bold">saunaboeken.com</span>
           </Link>
           <p className="text-sm text-muted-foreground">
-            Dé onafhankelijke saunagids van Nederland. Vind, vergelijk en beoordeel sauna's en wellness centra in alle 12 provincies.
+            Sauna boeken? Dé onafhankelijke saunagids van Nederland. Vind, vergelijk en boek sauna's en wellness centra in alle 12 provincies.
           </p>
         </div>
         <div>
@@ -42,20 +42,20 @@ const Footer = () => (
           <h4 className="font-serif font-semibold mb-3 mt-6">Populaire steden</h4>
           <div className="flex flex-col gap-1">
             <Link to="/sauna/noord-holland/amsterdam" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Sauna's in Amsterdam
+              Sauna boeken Amsterdam
             </Link>
             <Link to="/sauna/zuid-holland/rotterdam" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Sauna's in Rotterdam
+              Sauna boeken Rotterdam
             </Link>
             <Link to="/sauna/utrecht/utrecht" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Sauna's in Utrecht
+              Sauna boeken Utrecht
             </Link>
           </div>
         </div>
         <div>
           <h4 className="font-serif font-semibold mb-3">Over Saunaboeken.com</h4>
           <p className="text-sm text-muted-foreground">
-            Saunaboeken.com helpt je de perfecte sauna te vinden. Onafhankelijk, betrouwbaar en altijd up-to-date. Bekijk reviews van echte bezoekers en vergelijk wellness centra door heel Nederland.
+            Saunaboeken.com helpt je de perfecte sauna te boeken. Onafhankelijk, betrouwbaar en altijd up-to-date. Vergelijk sauna's, lees reviews en boek direct jouw wellness ervaring.
           </p>
         </div>
       </div>

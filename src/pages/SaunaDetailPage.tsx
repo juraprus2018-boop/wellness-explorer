@@ -132,8 +132,8 @@ const SaunaDetailPage = () => {
   return (
     <>
       <SEOHead
-        title={`${sauna.name} — Sauna in ${sauna.plaatsnaam} | Saunaboeken.com`}
-        description={sauna.description ? sauna.description.substring(0, 155) : `${sauna.name} is een sauna in ${sauna.plaatsnaam}, ${sauna.provincie}. Bekijk reviews, openingstijden en foto's.`}
+        title={`${sauna.name} boeken — Sauna in ${sauna.plaatsnaam} | Saunaboeken.com`}
+        description={sauna.description ? sauna.description.substring(0, 155) : `${sauna.name} boeken in ${sauna.plaatsnaam}, ${sauna.provincie}. Bekijk reviews, openingstijden, foto's en boek direct.`}
         canonical={`https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}/${slug}`}
         jsonLd={jsonLd}
       />
@@ -273,8 +273,8 @@ const SaunaDetailPage = () => {
             {/* CTA */}
             {sauna.website && (
               <Button size="lg" className="w-full sm:w-auto" asChild>
-                <a href={sauna.website} target="_blank" rel="noopener noreferrer">
-                  <Globe className="mr-2 h-4 w-4" /> Bezoek website
+              <a href={sauna.website} target="_blank" rel="noopener noreferrer">
+                  <Globe className="mr-2 h-4 w-4" /> Sauna boeken
                 </a>
               </Button>
             )}
@@ -358,13 +358,13 @@ const SaunaDetailPage = () => {
               </CardHeader>
               <CardContent className="space-y-2">
                 <Link to={`/sauna/${provincie}`} className="block text-sm text-muted-foreground hover:text-primary">
-                  Alle sauna's in {province?.name || provincie}
+                  Sauna boeken in {province?.name || provincie}
                 </Link>
                 <Link to="/de-beste-saunas-van-nederland" className="block text-sm text-muted-foreground hover:text-primary">
-                  Top 10 beste sauna's
+                  Top 10 sauna's om te boeken
                 </Link>
                 <Link to="/kaart" className="block text-sm text-muted-foreground hover:text-primary">
-                  Sauna kaart Nederland
+                  Sauna boeken op de kaart
                 </Link>
               </CardContent>
             </Card>

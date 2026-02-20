@@ -49,8 +49,8 @@ const Top10Page = () => {
   return (
     <div className="container py-10">
       <SEOHead
-        title="Top 10 beste sauna's van Nederland 2025 | Saunaboeken.com"
-        description="Ontdek de 10 best beoordeelde sauna's en wellness centra van Nederland. Vergelijk reviews, bekijk foto's en vind de beste sauna."
+        title="Top 10 beste sauna's om te boeken in Nederland 2025 | Saunaboeken.com"
+        description="Sauna boeken? Ontdek de 10 best beoordeelde sauna's van Nederland. Vergelijk reviews, bekijk foto's en boek direct de beste sauna."
         canonical="https://saunaboeken.com/de-beste-saunas-van-nederland"
         jsonLd={jsonLd}
       />
@@ -63,9 +63,9 @@ const Top10Page = () => {
 
       <div className="mb-10 text-center">
         <Trophy className="mx-auto mb-4 h-12 w-12 text-warm-gold" />
-        <h1 className="font-serif text-4xl font-bold">De 10 beste sauna's van Nederland</h1>
+        <h1 className="font-serif text-4xl font-bold">De 10 beste sauna's om te boeken in Nederland</h1>
         <p className="mt-3 mx-auto max-w-2xl text-muted-foreground">
-          Welke sauna is de beste van Nederland? Onze top 10 is gebaseerd op beoordelingen en reviews van echte bezoekers. Ontdek welke wellness centra het hoogst scoren.
+          Welke sauna moet je boeken? Onze top 10 is gebaseerd op beoordelingen en reviews van echte bezoekers. Ontdek de best beoordeelde sauna's en boek direct.
         </p>
       </div>
 
