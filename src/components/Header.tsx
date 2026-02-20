@@ -17,7 +17,7 @@ const Header = () => {
         <Link to="/" className="flex items-center gap-2">
           <MapPin className="h-6 w-6 text-primary" />
           <span className="font-serif text-xl font-bold text-foreground">
-            Saunaboeken
+            saunaboeken.com
           </span>
         </Link>
 
