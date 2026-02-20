@@ -63,8 +63,8 @@ const PlaatsPage = () => {
   return (
     <div className="container py-10">
       <SEOHead
-        title={`Sauna's in ${displayPlaats}, ${province?.name || provincie} | Saunaboeken.com`}
-        description={`Alle ${saunas?.length || ""} sauna's en wellness centra in ${displayPlaats}. Bekijk reviews, foto's en openingstijden.`}
+        title={`Sauna boeken ${displayPlaats} — Vind & boek een sauna | Saunaboeken.com`}
+        description={`Sauna boeken in ${displayPlaats}? Bekijk alle ${saunas?.length || ""} sauna's en wellness centra. Vergelijk reviews, foto's en boek direct jouw sauna in ${displayPlaats}.`}
         canonical={`https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}`}
         jsonLd={jsonLd}
       />
@@ -77,9 +77,9 @@ const PlaatsPage = () => {
         <span className="text-foreground">{displayPlaats}</span>
       </nav>
 
-      <h1 className="mb-2 font-serif text-3xl font-bold">Sauna's in {displayPlaats}</h1>
+      <h1 className="mb-2 font-serif text-3xl font-bold">Sauna boeken in {displayPlaats}</h1>
       <p className="mb-8 text-muted-foreground">
-        Ontdek alle sauna's en wellness centra in {displayPlaats}, {province?.name || provincie}. Vergelijk beoordelingen en vind de ideale sauna.
+        Wil je een sauna boeken in {displayPlaats}? Ontdek alle sauna's en wellness centra in {displayPlaats}, {province?.name || provincie}. Vergelijk beoordelingen en boek direct de ideale sauna.
       </p>
 
       <AdPlaceholder className="mb-8" />

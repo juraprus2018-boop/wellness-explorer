@@ -71,8 +71,8 @@ const Index = () => {
   return (
     <>
       <SEOHead
-        title="Saunaboeken.com — Ontdek de beste sauna's van Nederland"
-        description="Vind en vergelijk de beste sauna's en wellness centra in heel Nederland. Bekijk reviews, foto's, openingstijden en boek direct."
+        title="Sauna boeken — Vind & boek de beste sauna's van Nederland"
+        description="Sauna boeken? Vergelijk sauna's en wellness centra in heel Nederland. Bekijk reviews, foto's, openingstijden en boek direct de perfecte sauna bij jou in de buurt."
         canonical="https://saunaboeken.com/"
         jsonLd={jsonLd}
       />
@@ -85,10 +85,10 @@ const Index = () => {
         </div>
         <div className="container relative flex flex-col items-center py-24 text-center md:py-36">
           <h1 className="mb-4 max-w-3xl text-4xl font-bold text-white md:text-5xl lg:text-6xl font-serif">
-            Ontdek de beste sauna's van Nederland
+            Sauna boeken in Nederland
           </h1>
           <p className="mb-8 max-w-xl text-lg text-white/85">
-            Vergelijk {totalSaunas > 0 ? `${totalSaunas}+ ` : ""}sauna's en wellness centra in alle 12 provincies. Lees reviews, bekijk foto's en vind de perfecte sauna bij jou in de buurt.
+            Wil je een sauna boeken? Vergelijk {totalSaunas > 0 ? `${totalSaunas}+ ` : ""}sauna's en wellness centra in alle 12 provincies. Lees reviews, bekijk foto's en boek direct de perfecte sauna bij jou in de buurt.
           </p>
           <div className="flex w-full max-w-md gap-2">
             <div className="relative flex-1">
@@ -109,9 +109,9 @@ const Index = () => {
 
       {/* Provincies overzicht */}
       <section className="container py-16">
-        <h2 className="mb-2 text-center font-serif text-3xl font-bold">Sauna's per provincie</h2>
+        <h2 className="mb-2 text-center font-serif text-3xl font-bold">Sauna boeken per provincie</h2>
         <p className="mb-10 text-center text-muted-foreground">
-          Nederland telt 12 provincies met elk unieke sauna- en wellnesslocaties. Kies een provincie om alle opties te bekijken.
+          Boek een sauna in één van de 12 provincies. Kies jouw provincie en ontdek alle beschikbare sauna's en wellness centra.
         </p>
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {filteredProvinces.map((province) => (
@@ -142,8 +142,8 @@ const Index = () => {
       {/* Featured saunas */}
       {topSaunas && topSaunas.length > 0 && (
         <section className="container py-16">
-          <h2 className="mb-2 text-center font-serif text-3xl font-bold">Populaire sauna's</h2>
-          <p className="mb-10 text-center text-muted-foreground">De best beoordeelde wellness centra van Nederland</p>
+          <h2 className="mb-2 text-center font-serif text-3xl font-bold">Populaire sauna's om te boeken</h2>
+          <p className="mb-10 text-center text-muted-foreground">De best beoordeelde sauna's die je nu kunt boeken</p>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {topSaunas.map((sauna) => (
               <Link key={sauna.id} to={`/sauna/${sauna.provincie_slug}/${sauna.plaatsnaam_slug}/${sauna.slug}`}>
@@ -209,17 +209,17 @@ const Index = () => {
       {/* SEO text block */}
       <section className="container py-16">
         <div className="mx-auto max-w-3xl prose prose-sm text-muted-foreground">
-          <h2 className="font-serif text-2xl font-bold text-foreground">Alles over sauna's in Nederland</h2>
+          <h2 className="font-serif text-2xl font-bold text-foreground">Sauna boeken in Nederland — Zo werkt het</h2>
           <p>
-            Nederland biedt een breed aanbod aan sauna's en wellness centra, verspreid over alle 12 provincies. Of je nu zoekt naar een luxe dagje wellness in{" "}
-            <Link to="/sauna/noord-holland" className="text-primary hover:underline">Noord-Holland</Link>, een rustgevende ervaring in{" "}
-            <Link to="/sauna/gelderland" className="text-primary hover:underline">Gelderland</Link> of een verrassende sauna in{" "}
-            <Link to="/sauna/limburg" className="text-primary hover:underline">Limburg</Link> — op Saunaboeken.com vind je alle informatie die je nodig hebt.
+            Wil je een sauna boeken? Op Saunaboeken.com vind je het complete aanbod van sauna's en wellness centra in heel Nederland. Of je nu een sauna wilt boeken in{" "}
+            <Link to="/sauna/noord-holland" className="text-primary hover:underline">Noord-Holland</Link>, een dagje wellness wilt boeken in{" "}
+            <Link to="/sauna/gelderland" className="text-primary hover:underline">Gelderland</Link> of een sauna zoekt in{" "}
+            <Link to="/sauna/limburg" className="text-primary hover:underline">Limburg</Link> — hier vind je alle informatie om de juiste keuze te maken.
           </p>
           <p>
-            Bekijk openingstijden, lees eerlijke reviews van bezoekers, vergelijk beoordelingen en bekijk foto's van de faciliteiten. Gebruik onze{" "}
-            <Link to="/kaart" className="text-primary hover:underline">interactieve kaart</Link> om sauna's bij jou in de buurt te vinden, of ontdek de{" "}
-            <Link to="/de-beste-saunas-van-nederland" className="text-primary hover:underline">top 10 beste sauna's van Nederland</Link>.
+            Vergelijk sauna's op prijs, reviews en faciliteiten. Bekijk openingstijden en foto's, en boek direct via de website van de sauna. Gebruik onze{" "}
+            <Link to="/kaart" className="text-primary hover:underline">interactieve kaart</Link> om een sauna bij jou in de buurt te boeken, of bekijk de{" "}
+            <Link to="/de-beste-saunas-van-nederland" className="text-primary hover:underline">top 10 beste sauna's om te boeken</Link>.
           </p>
         </div>
       </section>

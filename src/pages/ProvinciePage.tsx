@@ -81,8 +81,8 @@ const ProvinciePage = () => {
   return (
     <div className="container py-10">
       <SEOHead
-        title={`Sauna's in ${province.name} — Alle wellness centra | Saunaboeken.com`}
-        description={`Ontdek ${totalSaunas > 0 ? totalSaunas + " " : ""}sauna's en wellness centra in ${province.name}. Bekijk reviews, openingstijden en foto's.`}
+        title={`Sauna boeken ${province.name} — Vind & boek een sauna | Saunaboeken.com`}
+        description={`Sauna boeken in ${province.name}? Bekijk ${totalSaunas > 0 ? totalSaunas + " " : ""}sauna's en wellness centra. Vergelijk reviews, openingstijden en boek direct jouw sauna.`}
         canonical={`https://saunaboeken.com/sauna/${provincie}`}
         jsonLd={jsonLd}
       />
@@ -93,9 +93,9 @@ const ProvinciePage = () => {
         <span className="text-foreground">{province.name}</span>
       </nav>
 
-      <h1 className="mb-2 font-serif text-3xl font-bold">Sauna's in {province.name}</h1>
+      <h1 className="mb-2 font-serif text-3xl font-bold">Sauna boeken in {province.name}</h1>
       <p className="mb-8 text-muted-foreground">
-        Bekijk alle {totalSaunas > 0 ? `${totalSaunas} ` : ""}sauna's en wellness centra in de provincie {province.name}. Vergelijk beoordelingen, bekijk openingstijden en vind de perfecte sauna.
+        Wil je een sauna boeken in {province.name}? Bekijk alle {totalSaunas > 0 ? `${totalSaunas} ` : ""}sauna's en wellness centra. Vergelijk beoordelingen, openingstijden en boek direct de perfecte sauna.
       </p>
 
       <AdPlaceholder className="mb-8" />
@@ -113,7 +113,7 @@ const ProvinciePage = () => {
         </div>
       ) : plaatsen && plaatsen.length > 0 ? (
         <>
-          <h2 className="mb-4 font-serif text-xl font-semibold">Plaatsen met sauna's in {province.name}</h2>
+          <h2 className="mb-4 font-serif text-xl font-semibold">Sauna boeken per plaats in {province.name}</h2>
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             {plaatsen.map((plaats) => (
               <Link key={plaats.slug} to={`/sauna/${provincie}/${plaats.slug}`}>
@@ -146,7 +146,7 @@ const ProvinciePage = () => {
 
       {/* Internal links to other provinces */}
       <section className="mt-12 border-t border-border pt-8">
-        <h2 className="mb-4 font-serif text-xl font-semibold">Sauna's in andere provincies</h2>
+        <h2 className="mb-4 font-serif text-xl font-semibold">Sauna boeken in andere provincies</h2>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
           {otherProvinces.map((p) => (
             <Link
@@ -154,7 +154,7 @@ const ProvinciePage = () => {
               to={`/sauna/${p.slug}`}
               className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
             >
-              Sauna's in {p.name}
+              Sauna boeken {p.name}
             </Link>
           ))}
         </div>

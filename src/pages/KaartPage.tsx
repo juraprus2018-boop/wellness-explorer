@@ -47,8 +47,8 @@ const KaartPage = () => {
   return (
     <div className="container py-10">
       <SEOHead
-        title="Sauna kaart Nederland — Vind sauna's bij jou in de buurt | Saunaboeken.com"
-        description="Bekijk alle sauna's en wellness centra op een interactieve kaart van Nederland. Filter op provincie en vind direct een sauna bij jou in de buurt."
+        title="Sauna boeken op de kaart — Vind & boek een sauna bij jou in de buurt"
+        description="Sauna boeken bij jou in de buurt? Bekijk alle sauna's op de interactieve kaart van Nederland. Filter op provincie en boek direct."
         canonical="https://saunaboeken.com/kaart"
         jsonLd={jsonLd}
       />
@@ -61,9 +61,9 @@ const KaartPage = () => {
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-serif text-3xl font-bold">Sauna kaart van Nederland</h1>
+          <h1 className="font-serif text-3xl font-bold">Sauna boeken op de kaart</h1>
           <p className="text-muted-foreground">
-            {filteredSaunas.length} sauna's en wellness centra op de kaart. Klik op een marker voor meer informatie.
+            {filteredSaunas.length} sauna's om te boeken op de kaart. Klik op een marker en boek direct jouw sauna.
           </p>
         </div>
         <Select value={selectedProvince} onValueChange={setSelectedProvince}>
@@ -85,7 +85,7 @@ const KaartPage = () => {
 
       {/* Internal links */}
       <section className="mt-10 border-t border-border pt-6">
-        <h2 className="mb-3 font-serif text-xl font-semibold">Bekijk sauna's per provincie</h2>
+        <h2 className="mb-3 font-serif text-xl font-semibold">Sauna boeken per provincie</h2>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
           {PROVINCES.map((p) => (
             <Link
