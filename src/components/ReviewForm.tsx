@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Star, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
+
+const RECAPTCHA_SITE_KEY = "6Lf72tQrAAAAAM1rLy7CSMy9M8mhdfBZJgKeLhzK";
 
 const reviewSchema = z.object({
   reviewer_name: z.string().trim().min(1, "Naam is verplicht").max(100),
@@ -21,6 +23,12 @@ interface ReviewFormProps {
   saunaId: string;
 }
 
+declare global {
+  interface Window {
+    grecaptcha: any;
+  }
+}
+
 const ReviewForm = ({ saunaId }: ReviewFormProps) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -29,8 +37,39 @@ const ReviewForm = ({ saunaId }: ReviewFormProps) => {
   const [text, setText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const recaptchaRef = useRef<HTMLDivElement>(null);
+  const recaptchaWidgetId = useRef<number | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const renderRecaptcha = useCallback(() => {
+    if (
+      recaptchaRef.current &&
+      window.grecaptcha &&
+      window.grecaptcha.render &&
+      recaptchaWidgetId.current === null
+    ) {
+      recaptchaWidgetId.current = window.grecaptcha.render(recaptchaRef.current, {
+        sitekey: RECAPTCHA_SITE_KEY,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    // If grecaptcha is already loaded, render immediately
+    if (window.grecaptcha && window.grecaptcha.render) {
+      renderRecaptcha();
+    } else {
+      // Poll for it (loaded async)
+      const interval = setInterval(() => {
+        if (window.grecaptcha && window.grecaptcha.render) {
+          renderRecaptcha();
+          clearInterval(interval);
+        }
+      }, 500);
+      return () => clearInterval(interval);
+    }
+  }, [renderRecaptcha]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +91,42 @@ const ReviewForm = ({ saunaId }: ReviewFormProps) => {
       return;
     }
 
+    // Get reCAPTCHA token
+    const recaptchaToken = window.grecaptcha?.getResponse(recaptchaWidgetId.current);
+    if (!recaptchaToken) {
+      setErrors({ recaptcha: "Bevestig dat je geen robot bent" });
+      return;
+    }
+
     setIsSubmitting(true);
+
+    // Verify reCAPTCHA server-side
+    try {
+      const { data: verifyData, error: verifyError } = await supabase.functions.invoke(
+        "verify-recaptcha",
+        { body: { token: recaptchaToken } }
+      );
+
+      if (verifyError || !verifyData?.success) {
+        toast({
+          title: "reCAPTCHA verificatie mislukt",
+          description: "Probeer het opnieuw.",
+          variant: "destructive",
+        });
+        window.grecaptcha?.reset(recaptchaWidgetId.current);
+        setIsSubmitting(false);
+        return;
+      }
+    } catch {
+      toast({
+        title: "Fout bij verificatie",
+        description: "Probeer het later opnieuw.",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
     const { error } = await supabase.from("reviews").insert({
       sauna_id: saunaId,
       reviewer_name: result.data.reviewer_name,
@@ -72,6 +146,7 @@ const ReviewForm = ({ saunaId }: ReviewFormProps) => {
       } else {
         toast({ title: "Fout bij plaatsen review", description: error.message, variant: "destructive" });
       }
+      window.grecaptcha?.reset(recaptchaWidgetId.current);
       return;
     }
 
@@ -80,6 +155,7 @@ const ReviewForm = ({ saunaId }: ReviewFormProps) => {
     setEmail("");
     setRating(0);
     setText("");
+    window.grecaptcha?.reset(recaptchaWidgetId.current);
     queryClient.invalidateQueries({ queryKey: ["reviews", saunaId] });
     queryClient.invalidateQueries({ queryKey: ["sauna-detail"] });
   };
@@ -153,6 +229,12 @@ const ReviewForm = ({ saunaId }: ReviewFormProps) => {
               maxLength={1000}
               rows={4}
             />
+          </div>
+
+          {/* reCAPTCHA widget */}
+          <div className="space-y-2">
+            <div ref={recaptchaRef} />
+            {errors.recaptcha && <p className="text-sm text-destructive">{errors.recaptcha}</p>}
           </div>
 
           <Button type="submit" disabled={isSubmitting}>
