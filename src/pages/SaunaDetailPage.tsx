@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import AdPlaceholder from "@/components/AdPlaceholder";
+import ReviewForm from "@/components/ReviewForm";
 import { supabase } from "@/integrations/supabase/client";
 import { PROVINCES } from "@/lib/provinces";
 
@@ -228,8 +229,8 @@ const SaunaDetailPage = () => {
               ) : (
                 <p className="text-muted-foreground">Nog geen reviews. Wees de eerste!</p>
               )}
-              <div className="mt-4 rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center">
-                <p className="text-sm text-muted-foreground">Review formulier (komt in Fase 4)</p>
+              <div className="mt-4">
+                <ReviewForm saunaId={sauna.id} />
               </div>
             </CardContent>
           </Card>
