@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import AdPlaceholder from "@/components/AdPlaceholder";
 import ReviewForm from "@/components/ReviewForm";
+import SEOHead from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import { PROVINCES } from "@/lib/provinces";
 
@@ -80,9 +81,63 @@ const SaunaDetailPage = () => {
   }
 
   const openingHours = sauna.opening_hours as string[] | null;
+  const rating = sauna.average_rating != null ? Number(sauna.average_rating) : 0;
+
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://saunaboeken.com/" },
+        { "@type": "ListItem", position: 2, name: province?.name || provincie, item: `https://saunaboeken.com/sauna/${provincie}` },
+        { "@type": "ListItem", position: 3, name: sauna.plaatsnaam, item: `https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}` },
+        { "@type": "ListItem", position: 4, name: sauna.name, item: `https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}/${slug}` },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "HealthAndBeautyBusiness",
+      name: sauna.name,
+      description: sauna.description || `${sauna.name} is een sauna en wellness centrum in ${sauna.plaatsnaam}, ${sauna.provincie}.`,
+      url: `https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}/${slug}`,
+      ...(sauna.website && { sameAs: sauna.website }),
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: sauna.plaatsnaam,
+        addressRegion: sauna.provincie,
+        addressCountry: "NL",
+        ...(sauna.address && { streetAddress: sauna.address }),
+      },
+      ...(sauna.phone && { telephone: sauna.phone }),
+      ...(sauna.photo_urls && sauna.photo_urls[0] && { image: sauna.photo_urls[0] }),
+      ...(rating > 0 && {
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: rating.toFixed(1),
+          bestRating: "5",
+          worstRating: "1",
+          reviewCount: sauna.review_count || 1,
+        },
+      }),
+      ...(sauna.lat && sauna.lng && {
+        geo: {
+          "@type": "GeoCoordinates",
+          latitude: sauna.lat,
+          longitude: sauna.lng,
+        },
+      }),
+    },
+  ];
 
   return (
     <>
+      <SEOHead
+        title={`${sauna.name} — Sauna in ${sauna.plaatsnaam} | Saunaboeken.com`}
+        description={sauna.description ? sauna.description.substring(0, 155) : `${sauna.name} is een sauna in ${sauna.plaatsnaam}, ${sauna.provincie}. Bekijk reviews, openingstijden en foto's.`}
+        canonical={`https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}/${slug}`}
+        jsonLd={jsonLd}
+      />
+
       {/* Full-width hero banner */}
       {sauna.photo_urls && sauna.photo_urls.length > 0 ? (
         <div className="relative w-full">
@@ -93,7 +148,7 @@ const SaunaDetailPage = () => {
                   <div className="relative h-[35vh] sm:h-[45vh] md:h-[55vh] w-full">
                     <img
                       src={url}
-                      alt={`${sauna.name} foto ${i + 1}`}
+                      alt={`${sauna.name} — foto ${i + 1}`}
                       className="h-full w-full object-cover"
                       loading={i === 0 ? "eager" : "lazy"}
                     />
@@ -109,7 +164,6 @@ const SaunaDetailPage = () => {
               </>
             )}
           </Carousel>
-          {/* Overlay title on banner */}
           <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
             <div className="container">
               <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
@@ -199,8 +253,8 @@ const SaunaDetailPage = () => {
                   <div>
                     <p className="text-sm text-muted-foreground">Beoordeling</p>
                     <p className="font-medium">
-                      {sauna.average_rating != null && Number(sauna.average_rating) > 0
-                        ? `${Number(sauna.average_rating).toFixed(1)} / 5 (${sauna.review_count} reviews)`
+                      {rating > 0
+                        ? `${rating.toFixed(1)} / 5 (${sauna.review_count} reviews)`
                         : "Nog geen reviews"}
                     </p>
                   </div>
@@ -211,7 +265,7 @@ const SaunaDetailPage = () => {
             {/* Description */}
             {sauna.description && (
               <Card>
-                <CardHeader><CardTitle className="font-serif">Beschrijving</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="font-serif">Over {sauna.name}</CardTitle></CardHeader>
                 <CardContent><p className="text-muted-foreground">{sauna.description}</p></CardContent>
               </Card>
             )}
@@ -272,7 +326,7 @@ const SaunaDetailPage = () => {
             {relatedSaunas && relatedSaunas.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-serif text-lg">Meer in {sauna.plaatsnaam}</CardTitle>
+                  <CardTitle className="font-serif text-lg">Meer sauna's in {sauna.plaatsnaam}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {relatedSaunas.map((r) => (
@@ -296,6 +350,24 @@ const SaunaDetailPage = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Internal links sidebar */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-serif text-lg">Ontdek meer</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Link to={`/sauna/${provincie}`} className="block text-sm text-muted-foreground hover:text-primary">
+                  Alle sauna's in {province?.name || provincie}
+                </Link>
+                <Link to="/de-beste-saunas-van-nederland" className="block text-sm text-muted-foreground hover:text-primary">
+                  Top 10 beste sauna's
+                </Link>
+                <Link to="/kaart" className="block text-sm text-muted-foreground hover:text-primary">
+                  Sauna kaart Nederland
+                </Link>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

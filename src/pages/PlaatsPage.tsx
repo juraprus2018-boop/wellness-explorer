@@ -4,6 +4,7 @@ import { MapPin, Star, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import AdPlaceholder from "@/components/AdPlaceholder";
+import SEOHead from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import { PROVINCES } from "@/lib/provinces";
 import SafeSaunaMap from "@/components/SafeSaunaMap";
@@ -33,8 +34,41 @@ const PlaatsPage = () => {
     return saunas.filter((s) => s.lat != null && s.lng != null);
   }, [saunas]);
 
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://saunaboeken.com/" },
+        { "@type": "ListItem", position: 2, name: province?.name || provincie, item: `https://saunaboeken.com/sauna/${provincie}` },
+        { "@type": "ListItem", position: 3, name: displayPlaats, item: `https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}` },
+      ],
+    },
+    ...(saunas && saunas.length > 0
+      ? [{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: `Sauna's in ${displayPlaats}`,
+          numberOfItems: saunas.length,
+          itemListElement: saunas.map((s, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            name: s.name,
+            url: `https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}/${s.slug}`,
+          })),
+        }]
+      : []),
+  ];
+
   return (
     <div className="container py-10">
+      <SEOHead
+        title={`Sauna's in ${displayPlaats}, ${province?.name || provincie} | Saunaboeken.com`}
+        description={`Alle ${saunas?.length || ""} sauna's en wellness centra in ${displayPlaats}. Bekijk reviews, foto's en openingstijden.`}
+        canonical={`https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}`}
+        jsonLd={jsonLd}
+      />
+
       <nav className="mb-6 text-sm text-muted-foreground">
         <Link to="/" className="hover:text-primary">Home</Link>
         <span className="mx-2">/</span>
@@ -45,14 +79,14 @@ const PlaatsPage = () => {
 
       <h1 className="mb-2 font-serif text-3xl font-bold">Sauna's in {displayPlaats}</h1>
       <p className="mb-8 text-muted-foreground">
-        Alle wellness centra in {displayPlaats}, {province?.name || provincie}.
+        Ontdek alle sauna's en wellness centra in {displayPlaats}, {province?.name || provincie}. Vergelijk beoordelingen en vind de ideale sauna.
       </p>
 
       <AdPlaceholder className="mb-8" />
 
       {saunasForMap.length > 0 && (
         <div className="mb-8">
-          <h2 className="mb-3 font-serif text-xl font-semibold">Kaart</h2>
+          <h2 className="mb-3 font-serif text-xl font-semibold">Kaart van sauna's in {displayPlaats}</h2>
           <SafeSaunaMap saunas={saunasForMap} height="300px" />
         </div>
       )}
@@ -68,7 +102,7 @@ const PlaatsPage = () => {
               <Card className="group cursor-pointer overflow-hidden transition-all hover:shadow-lg">
                 <div className="aspect-[4/3] bg-muted">
                   {sauna.photo_urls && sauna.photo_urls[0] ? (
-                    <img src={sauna.photo_urls[0]} alt={sauna.name} className="h-full w-full object-cover" loading="lazy" />
+                    <img src={sauna.photo_urls[0]} alt={`${sauna.name} in ${displayPlaats}`} className="h-full w-full object-cover" loading="lazy" />
                   ) : (
                     <div className="flex h-full items-center justify-center">
                       <MapPin className="h-8 w-8 text-muted-foreground/30" />
@@ -101,6 +135,13 @@ const PlaatsPage = () => {
           <p className="text-muted-foreground">Geen sauna's gevonden in deze plaats.</p>
         </div>
       )}
+
+      {/* Link back to province */}
+      <div className="mt-10 border-t border-border pt-6">
+        <Link to={`/sauna/${provincie}`} className="text-sm text-primary hover:underline">
+          ← Bekijk alle sauna's in {province?.name || provincie}
+        </Link>
+      </div>
 
       <AdPlaceholder className="mt-8" />
     </div>

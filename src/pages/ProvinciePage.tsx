@@ -1,9 +1,10 @@
 import { useParams, Link } from "react-router-dom";
-import { MapPin, ArrowRight, Star } from "lucide-react";
+import { MapPin, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { PROVINCES } from "@/lib/provinces";
 import { Card, CardContent } from "@/components/ui/card";
 import AdPlaceholder from "@/components/AdPlaceholder";
+import SEOHead from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import SafeSaunaMap from "@/components/SafeSaunaMap";
 
@@ -58,8 +59,34 @@ const ProvinciePage = () => {
     );
   }
 
+  const totalSaunas = plaatsen ? plaatsen.reduce((a, p) => a + p.count, 0) : 0;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `Sauna's in ${province.name}`,
+    description: `Overzicht van alle ${totalSaunas} sauna's en wellness centra in de provincie ${province.name}.`,
+    url: `https://saunaboeken.com/sauna/${provincie}`,
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://saunaboeken.com/" },
+        { "@type": "ListItem", position: 2, name: province.name, item: `https://saunaboeken.com/sauna/${provincie}` },
+      ],
+    },
+  };
+
+  const otherProvinces = PROVINCES.filter((p) => p.slug !== provincie);
+
   return (
     <div className="container py-10">
+      <SEOHead
+        title={`Sauna's in ${province.name} — Alle wellness centra | Saunaboeken.com`}
+        description={`Ontdek ${totalSaunas > 0 ? totalSaunas + " " : ""}sauna's en wellness centra in ${province.name}. Bekijk reviews, openingstijden en foto's.`}
+        canonical={`https://saunaboeken.com/sauna/${provincie}`}
+        jsonLd={jsonLd}
+      />
+
       <nav className="mb-6 text-sm text-muted-foreground">
         <Link to="/" className="hover:text-primary">Home</Link>
         <span className="mx-2">/</span>
@@ -68,14 +95,14 @@ const ProvinciePage = () => {
 
       <h1 className="mb-2 font-serif text-3xl font-bold">Sauna's in {province.name}</h1>
       <p className="mb-8 text-muted-foreground">
-        Ontdek alle wellness centra en sauna's in de provincie {province.name}.
+        Bekijk alle {totalSaunas > 0 ? `${totalSaunas} ` : ""}sauna's en wellness centra in de provincie {province.name}. Vergelijk beoordelingen, bekijk openingstijden en vind de perfecte sauna.
       </p>
 
       <AdPlaceholder className="mb-8" />
 
       {saunasForMap && saunasForMap.length > 0 && (
         <div className="mb-8">
-          <h2 className="mb-3 font-serif text-xl font-semibold">Kaart</h2>
+          <h2 className="mb-3 font-serif text-xl font-semibold">Sauna's op de kaart in {province.name}</h2>
           <SafeSaunaMap saunas={saunasForMap} height="350px" />
         </div>
       )}
@@ -85,26 +112,29 @@ const ProvinciePage = () => {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
         </div>
       ) : plaatsen && plaatsen.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-          {plaatsen.map((plaats) => (
-            <Link key={plaats.slug} to={`/sauna/${provincie}/${plaats.slug}`}>
-              <Card className="group cursor-pointer transition-all hover:shadow-lg hover:border-primary/30">
-                <CardContent className="flex items-center justify-between p-5">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                      <MapPin className="h-5 w-5 text-primary" />
+        <>
+          <h2 className="mb-4 font-serif text-xl font-semibold">Plaatsen met sauna's in {province.name}</h2>
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {plaatsen.map((plaats) => (
+              <Link key={plaats.slug} to={`/sauna/${provincie}/${plaats.slug}`}>
+                <Card className="group cursor-pointer transition-all hover:shadow-lg hover:border-primary/30">
+                  <CardContent className="flex items-center justify-between p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                        <MapPin className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <span className="font-medium">{plaats.name}</span>
+                        <p className="text-xs text-muted-foreground">{plaats.count} sauna's</p>
+                      </div>
                     </div>
-                    <div>
-                      <span className="font-medium">{plaats.name}</span>
-                      <p className="text-xs text-muted-foreground">{plaats.count} sauna's</p>
-                    </div>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </>
       ) : (
         <div className="rounded-lg border border-dashed border-border bg-muted/30 p-12 text-center">
           <MapPin className="mx-auto mb-3 h-10 w-10 text-muted-foreground/50" />
@@ -113,6 +143,22 @@ const ProvinciePage = () => {
           </p>
         </div>
       )}
+
+      {/* Internal links to other provinces */}
+      <section className="mt-12 border-t border-border pt-8">
+        <h2 className="mb-4 font-serif text-xl font-semibold">Sauna's in andere provincies</h2>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+          {otherProvinces.map((p) => (
+            <Link
+              key={p.slug}
+              to={`/sauna/${p.slug}`}
+              className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
+            >
+              Sauna's in {p.name}
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <AdPlaceholder className="mt-8" />
     </div>

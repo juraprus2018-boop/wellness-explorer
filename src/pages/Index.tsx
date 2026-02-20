@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Search, Star, MapPin, ArrowRight } from "lucide-react";
+import { Search, Star, MapPin, ArrowRight, Map } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { PROVINCES } from "@/lib/provinces";
 import AdPlaceholder from "@/components/AdPlaceholder";
+import SEOHead from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-sauna.jpg";
 
@@ -17,13 +18,10 @@ const Index = () => {
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Count saunas per province
   const { data: provinceCounts } = useQuery({
     queryKey: ["province-counts"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("saunas")
-        .select("provincie_slug");
+      const { data } = await supabase.from("saunas").select("provincie_slug");
       const counts: Record<string, number> = {};
       (data || []).forEach((s) => {
         counts[s.provincie_slug] = (counts[s.provincie_slug] || 0) + 1;
@@ -32,7 +30,6 @@ const Index = () => {
     },
   });
 
-  // Top rated saunas for teaser
   const { data: topSaunas } = useQuery({
     queryKey: ["top-saunas-home"],
     queryFn: async () => {
@@ -45,12 +42,45 @@ const Index = () => {
     },
   });
 
+  const totalSaunas = provinceCounts
+    ? Object.values(provinceCounts).reduce((a, b) => a + b, 0)
+    : 0;
+
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "Saunaboeken.com",
+      url: "https://saunaboeken.com/",
+      description: "Vind en vergelijk de beste sauna's en wellness centra in Nederland.",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: "https://saunaboeken.com/?q={search_term_string}",
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "Saunaboeken.com",
+      url: "https://saunaboeken.com/",
+      logo: "https://saunaboeken.com/favicon.png",
+    },
+  ];
+
   return (
     <>
+      <SEOHead
+        title="Saunaboeken.com — Ontdek de beste sauna's van Nederland"
+        description="Vind en vergelijk de beste sauna's en wellness centra in heel Nederland. Bekijk reviews, foto's, openingstijden en boek direct."
+        canonical="https://saunaboeken.com/"
+        jsonLd={jsonLd}
+      />
+
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroImage} alt="Sfeervolle sauna" className="h-full w-full object-cover" loading="eager" />
+          <img src={heroImage} alt="Sfeervolle sauna in Nederland" className="h-full w-full object-cover" loading="eager" />
           <div className="absolute inset-0 bg-gradient-to-b from-foreground/60 via-foreground/40 to-background" />
         </div>
         <div className="container relative flex flex-col items-center py-24 text-center md:py-36">
@@ -58,7 +88,7 @@ const Index = () => {
             Ontdek de beste sauna's van Nederland
           </h1>
           <p className="mb-8 max-w-xl text-lg text-white/85">
-            Vind en vergelijk wellness centra bij jou in de buurt. Lees reviews en boek direct.
+            Vergelijk {totalSaunas > 0 ? `${totalSaunas}+ ` : ""}sauna's en wellness centra in alle 12 provincies. Lees reviews, bekijk foto's en vind de perfecte sauna bij jou in de buurt.
           </p>
           <div className="flex w-full max-w-md gap-2">
             <div className="relative flex-1">
@@ -80,7 +110,9 @@ const Index = () => {
       {/* Provincies overzicht */}
       <section className="container py-16">
         <h2 className="mb-2 text-center font-serif text-3xl font-bold">Sauna's per provincie</h2>
-        <p className="mb-10 text-center text-muted-foreground">Kies een provincie om alle wellness locaties te bekijken</p>
+        <p className="mb-10 text-center text-muted-foreground">
+          Nederland telt 12 provincies met elk unieke sauna- en wellnesslocaties. Kies een provincie om alle opties te bekijken.
+        </p>
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {filteredProvinces.map((province) => (
             <Link key={province.slug} to={`/sauna/${province.slug}`}>
@@ -111,14 +143,14 @@ const Index = () => {
       {topSaunas && topSaunas.length > 0 && (
         <section className="container py-16">
           <h2 className="mb-2 text-center font-serif text-3xl font-bold">Populaire sauna's</h2>
-          <p className="mb-10 text-center text-muted-foreground">De best beoordeelde wellness centra</p>
+          <p className="mb-10 text-center text-muted-foreground">De best beoordeelde wellness centra van Nederland</p>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {topSaunas.map((sauna) => (
               <Link key={sauna.id} to={`/sauna/${sauna.provincie_slug}/${sauna.plaatsnaam_slug}/${sauna.slug}`}>
                 <Card className="group cursor-pointer overflow-hidden transition-all hover:shadow-lg">
                   <div className="aspect-[4/3] bg-muted">
                     {sauna.photo_urls && sauna.photo_urls[0] ? (
-                      <img src={sauna.photo_urls[0]} alt={sauna.name} className="h-full w-full object-cover" loading="lazy" />
+                      <img src={sauna.photo_urls[0]} alt={`${sauna.name} in ${sauna.plaatsnaam}`} className="h-full w-full object-cover" loading="lazy" />
                     ) : (
                       <div className="flex h-full items-center justify-center">
                         <MapPin className="h-8 w-8 text-muted-foreground/30" />
@@ -142,17 +174,53 @@ const Index = () => {
         </section>
       )}
 
-      {/* Top Sauna's teaser */}
+      {/* Internal links section */}
       <section className="bg-card py-16">
-        <div className="container text-center">
-          <Star className="mx-auto mb-4 h-10 w-10 text-warm-gold" />
-          <h2 className="mb-2 font-serif text-3xl font-bold">De beste sauna's van Nederland</h2>
-          <p className="mb-6 text-muted-foreground">Bekijk onze top 10 van de meest gewaardeerde wellness centra</p>
-          <Button asChild size="lg">
-            <Link to="/de-beste-saunas-van-nederland">
-              Bekijk Top 10 <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
+        <div className="container">
+          <div className="grid gap-8 md:grid-cols-2">
+            <div className="text-center md:text-left">
+              <Star className="mx-auto mb-4 h-10 w-10 text-warm-gold md:mx-0" />
+              <h2 className="mb-2 font-serif text-3xl font-bold">De beste sauna's van Nederland</h2>
+              <p className="mb-6 text-muted-foreground">
+                Bekijk onze top 10 van de meest gewaardeerde wellness centra, gebaseerd op reviews en beoordelingen van echte bezoekers.
+              </p>
+              <Button asChild size="lg">
+                <Link to="/de-beste-saunas-van-nederland">
+                  Bekijk Top 10 <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+            <div className="text-center md:text-left">
+              <Map className="mx-auto mb-4 h-10 w-10 text-primary md:mx-0" />
+              <h2 className="mb-2 font-serif text-3xl font-bold">Sauna's op de kaart</h2>
+              <p className="mb-6 text-muted-foreground">
+                Bekijk alle sauna's en wellness centra op een interactieve kaart. Filter op provincie en vind direct een sauna bij jou in de buurt.
+              </p>
+              <Button asChild size="lg" variant="outline">
+                <Link to="/kaart">
+                  Bekijk kaart <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SEO text block */}
+      <section className="container py-16">
+        <div className="mx-auto max-w-3xl prose prose-sm text-muted-foreground">
+          <h2 className="font-serif text-2xl font-bold text-foreground">Alles over sauna's in Nederland</h2>
+          <p>
+            Nederland biedt een breed aanbod aan sauna's en wellness centra, verspreid over alle 12 provincies. Of je nu zoekt naar een luxe dagje wellness in{" "}
+            <Link to="/sauna/noord-holland" className="text-primary hover:underline">Noord-Holland</Link>, een rustgevende ervaring in{" "}
+            <Link to="/sauna/gelderland" className="text-primary hover:underline">Gelderland</Link> of een verrassende sauna in{" "}
+            <Link to="/sauna/limburg" className="text-primary hover:underline">Limburg</Link> — op Saunaboeken.com vind je alle informatie die je nodig hebt.
+          </p>
+          <p>
+            Bekijk openingstijden, lees eerlijke reviews van bezoekers, vergelijk beoordelingen en bekijk foto's van de faciliteiten. Gebruik onze{" "}
+            <Link to="/kaart" className="text-primary hover:underline">interactieve kaart</Link> om sauna's bij jou in de buurt te vinden, of ontdek de{" "}
+            <Link to="/de-beste-saunas-van-nederland" className="text-primary hover:underline">top 10 beste sauna's van Nederland</Link>.
+          </p>
         </div>
       </section>
 
