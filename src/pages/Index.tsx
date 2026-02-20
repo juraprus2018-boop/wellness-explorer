@@ -92,9 +92,9 @@ const Index = () => {
                     </div>
                     <div>
                       <span className="font-medium">{province.name}</span>
-                      {provinceCounts && (
+                      {provinceCounts && provinceCounts[province.slug] > 0 && (
                         <p className="text-xs text-muted-foreground">
-                          {provinceCounts[province.slug] || 0} sauna's
+                          {provinceCounts[province.slug]} sauna's
                         </p>
                       )}
                     </div>
