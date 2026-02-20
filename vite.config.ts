@@ -18,4 +18,13 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          leaflet: ["leaflet", "react-leaflet"],
+        },
+      },
+    },
+  },
 }));
