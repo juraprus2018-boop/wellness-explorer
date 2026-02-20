@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Plus, List, Trophy, LogOut } from "lucide-react";
+import { Plus, List, Trophy, LogOut, Megaphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
@@ -30,7 +30,7 @@ const AdminDashboardPage = () => {
         </div>
       </header>
       <div className="container py-10">
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <Link to="/admin/saunas/toevoegen">
             <Card className="cursor-pointer transition-all hover:shadow-lg hover:border-primary/30">
               <CardHeader>
@@ -44,15 +44,17 @@ const AdminDashboardPage = () => {
               </CardContent>
             </Card>
           </Link>
-          <Card>
-            <CardHeader>
-              <List className="h-8 w-8 text-primary" />
-              <CardTitle className="font-serif">Alle sauna's</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">{saunaCount} sauna's</p>
-            </CardContent>
-          </Card>
+          <Link to="/admin/saunas">
+            <Card className="cursor-pointer transition-all hover:shadow-lg hover:border-primary/30">
+              <CardHeader>
+                <List className="h-8 w-8 text-primary" />
+                <CardTitle className="font-serif">Alle sauna's</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">{saunaCount} sauna's beheren</p>
+              </CardContent>
+            </Card>
+          </Link>
           <Link to="/admin/top-10">
             <Card className="cursor-pointer transition-all hover:shadow-lg hover:border-primary/30">
               <CardHeader>
@@ -62,6 +64,19 @@ const AdminDashboardPage = () => {
               <CardContent>
                 <p className="text-sm text-muted-foreground">
                   Bepaal de volgorde van de top 10
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to="/admin/advertenties">
+            <Card className="cursor-pointer transition-all hover:shadow-lg hover:border-primary/30">
+              <CardHeader>
+                <Megaphone className="h-8 w-8 text-primary" />
+                <CardTitle className="font-serif">Advertenties</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Google Ads per sectie configureren
                 </p>
               </CardContent>
             </Card>
