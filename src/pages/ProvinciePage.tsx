@@ -92,6 +92,8 @@ const ProvinciePage = () => {
           </p>
         </div>
       )}
+
+      <AdPlaceholder className="mt-8" />
     </div>
   );
 };
