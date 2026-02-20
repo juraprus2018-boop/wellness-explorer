@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Search, MapPin, Star, Loader2, Check } from "lucide-react";
+import { ArrowLeft, Search, MapPin, Star, Loader2, Check, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +27,8 @@ const AdminAddSaunaPage = () => {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [importing, setImporting] = useState<string | null>(null);
+  const [importingAll, setImportingAll] = useState(false);
+  const [importProgress, setImportProgress] = useState({ current: 0, total: 0 });
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -48,10 +50,8 @@ const AdminAddSaunaPage = () => {
     setSearching(false);
   };
 
-  const handleImport = async (placeId: string) => {
-    setImporting(placeId);
+  const importSingle = async (placeId: string): Promise<boolean> => {
     try {
-      // Get details
       const { data, error } = await supabase.functions.invoke("google-places", {
         body: { action: "details", placeId },
       });
@@ -62,7 +62,6 @@ const AdminAddSaunaPage = () => {
       const plaatsnaamSlug = slugify(d.plaatsnaam || "onbekend");
       const saunaSlug = slugify(d.name);
 
-      // Save to database
       const { error: insertError } = await supabase.from("saunas").insert({
         name: d.name,
         slug: saunaSlug,
@@ -83,19 +82,48 @@ const AdminAddSaunaPage = () => {
 
       if (insertError) {
         if (insertError.code === "23505") {
-          toast({ title: "Deze sauna bestaat al", variant: "destructive" });
-        } else {
-          throw insertError;
+          toast({ title: `${d.name} bestaat al`, variant: "destructive" });
+          return false;
         }
-      } else {
-        toast({ title: `${d.name} toegevoegd!` });
-        // Remove from results
-        setResults((prev) => prev.filter((r) => r.place_id !== placeId));
+        throw insertError;
       }
+      return true;
     } catch (err: any) {
-      toast({ title: "Importeren mislukt", description: err.message, variant: "destructive" });
+      toast({ title: "Import mislukt", description: err.message, variant: "destructive" });
+      return false;
+    }
+  };
+
+  const handleImport = async (placeId: string) => {
+    setImporting(placeId);
+    const success = await importSingle(placeId);
+    if (success) {
+      toast({ title: "Sauna toegevoegd!" });
+      setResults((prev) => prev.filter((r) => r.place_id !== placeId));
     }
     setImporting(null);
+  };
+
+  const handleImportAll = async () => {
+    if (results.length === 0) return;
+    setImportingAll(true);
+    setImportProgress({ current: 0, total: results.length });
+    let successCount = 0;
+    const imported: string[] = [];
+
+    for (let i = 0; i < results.length; i++) {
+      setImportProgress({ current: i + 1, total: results.length });
+      const success = await importSingle(results[i].place_id);
+      if (success) {
+        successCount++;
+        imported.push(results[i].place_id);
+      }
+    }
+
+    setResults((prev) => prev.filter((r) => !imported.includes(r.place_id)));
+    toast({ title: `${successCount} van ${results.length} sauna's geïmporteerd!` });
+    setImportingAll(false);
+    setImportProgress({ current: 0, total: 0 });
   };
 
   return (
@@ -132,13 +160,36 @@ const AdminAddSaunaPage = () => {
                   onChange={(e) => setQuery(e.target.value)}
                 />
               </div>
-              <Button type="submit" disabled={searching}>
+              <Button type="submit" disabled={searching || importingAll}>
                 {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : "Zoeken"}
               </Button>
             </form>
 
             {results.length > 0 && (
-              <div className="space-y-2">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">
+                    {results.length} resultaten gevonden
+                  </p>
+                  <Button
+                    onClick={handleImportAll}
+                    disabled={importingAll || importing !== null}
+                    variant="default"
+                    size="sm"
+                  >
+                    {importingAll ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                        {importProgress.current}/{importProgress.total}
+                      </>
+                    ) : (
+                      <>
+                        <Download className="h-4 w-4 mr-1" /> Alles importeren ({results.length})
+                      </>
+                    )}
+                  </Button>
+                </div>
+
                 {results.map((r) => (
                   <div
                     key={r.place_id}
@@ -158,7 +209,7 @@ const AdminAddSaunaPage = () => {
                     <Button
                       size="sm"
                       onClick={() => handleImport(r.place_id)}
-                      disabled={importing === r.place_id}
+                      disabled={importing === r.place_id || importingAll}
                     >
                       {importing === r.place_id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
