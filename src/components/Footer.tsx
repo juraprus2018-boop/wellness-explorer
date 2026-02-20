@@ -9,7 +9,7 @@ const Footer = () => (
         <div>
           <Link to="/" className="flex items-center gap-2 mb-3">
             <MapPin className="h-5 w-5 text-primary" />
-            <span className="font-serif text-lg font-bold">Saunaboeken</span>
+            <span className="font-serif text-lg font-bold">saunaboeken.com</span>
           </Link>
           <p className="text-sm text-muted-foreground">
             Ontdek de beste sauna's en wellness centra van Nederland.
