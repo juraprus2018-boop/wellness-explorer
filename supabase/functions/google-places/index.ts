@@ -20,9 +20,10 @@ serve(async (req) => {
 
     if (action === 'search') {
       // Text search for saunas/wellness
-      const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&language=nl&region=nl&key=${GOOGLE_PLACES_API_KEY}`;
+      const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=sauna+${encodeURIComponent(query)}&language=nl&region=nl&key=${GOOGLE_PLACES_API_KEY}`;
       const response = await fetch(url);
       const data = await response.json();
+      console.log('Google Places raw response status:', data.status, 'results count:', (data.results || []).length, 'error_message:', data.error_message || 'none');
 
       const results = (data.results || []).map((place: any) => ({
         place_id: place.place_id,
