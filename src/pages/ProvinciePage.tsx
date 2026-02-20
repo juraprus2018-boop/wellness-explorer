@@ -1,12 +1,37 @@
 import { useParams, Link } from "react-router-dom";
-import { MapPin, ArrowRight } from "lucide-react";
+import { MapPin, ArrowRight, Star } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { PROVINCES } from "@/lib/provinces";
 import { Card, CardContent } from "@/components/ui/card";
 import AdPlaceholder from "@/components/AdPlaceholder";
+import { supabase } from "@/integrations/supabase/client";
 
 const ProvinciePage = () => {
   const { provincie } = useParams<{ provincie: string }>();
   const province = PROVINCES.find((p) => p.slug === provincie);
+
+  const { data: plaatsen, isLoading } = useQuery({
+    queryKey: ["plaatsen", provincie],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("saunas")
+        .select("plaatsnaam, plaatsnaam_slug")
+        .eq("provincie_slug", provincie!)
+        .order("plaatsnaam");
+      // Group by plaatsnaam
+      const map = new Map<string, { name: string; slug: string; count: number }>();
+      (data || []).forEach((s) => {
+        const existing = map.get(s.plaatsnaam_slug);
+        if (existing) {
+          existing.count++;
+        } else {
+          map.set(s.plaatsnaam_slug, { name: s.plaatsnaam, slug: s.plaatsnaam_slug, count: 1 });
+        }
+      });
+      return Array.from(map.values());
+    },
+    enabled: !!provincie,
+  });
 
   if (!province) {
     return (
@@ -27,22 +52,46 @@ const ProvinciePage = () => {
         <span className="text-foreground">{province.name}</span>
       </nav>
 
-      <h1 className="mb-2 font-serif text-3xl font-bold">
-        Sauna's in {province.name}
-      </h1>
+      <h1 className="mb-2 font-serif text-3xl font-bold">Sauna's in {province.name}</h1>
       <p className="mb-8 text-muted-foreground">
         Ontdek alle wellness centra en sauna's in de provincie {province.name}.
       </p>
 
       <AdPlaceholder className="mb-8" />
 
-      {/* Placeholder — wordt gevuld met data uit de database */}
-      <div className="rounded-lg border border-dashed border-border bg-muted/30 p-12 text-center">
-        <MapPin className="mx-auto mb-3 h-10 w-10 text-muted-foreground/50" />
-        <p className="text-muted-foreground">
-          Plaatsen met sauna's worden hier getoond zodra de database is verbonden.
-        </p>
-      </div>
+      {isLoading ? (
+        <div className="flex justify-center py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        </div>
+      ) : plaatsen && plaatsen.length > 0 ? (
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+          {plaatsen.map((plaats) => (
+            <Link key={plaats.slug} to={`/sauna/${provincie}/${plaats.slug}`}>
+              <Card className="group cursor-pointer transition-all hover:shadow-lg hover:border-primary/30">
+                <CardContent className="flex items-center justify-between p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                      <MapPin className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <span className="font-medium">{plaats.name}</span>
+                      <p className="text-xs text-muted-foreground">{plaats.count} sauna's</p>
+                    </div>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-lg border border-dashed border-border bg-muted/30 p-12 text-center">
+          <MapPin className="mx-auto mb-3 h-10 w-10 text-muted-foreground/50" />
+          <p className="text-muted-foreground">
+            Er zijn nog geen sauna's toegevoegd in {province.name}.
+          </p>
+        </div>
+      )}
     </div>
   );
 };
