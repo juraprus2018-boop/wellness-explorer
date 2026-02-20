@@ -1,14 +1,16 @@
 import { Link } from "react-router-dom";
-import { MapPin, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { MapPin, Menu, ChevronDown, Star, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
-
-const navLinks = [
-  { label: "Home", to: "/" },
-  { label: "Kaart", to: "/kaart" },
-  { label: "Top 10", to: "/de-beste-saunas-van-nederland" },
-];
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+import { PROVINCES } from "@/lib/provinces";
 
 const Header = () => {
   return (
@@ -22,17 +24,55 @@ const Header = () => {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-6 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        <NavigationMenu className="hidden md:flex">
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <Link
+                to="/"
+                className="inline-flex h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+              >
+                Home
+              </Link>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className="text-muted-foreground">
+                Provincies
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <div className="grid w-[400px] gap-1 p-4 md:w-[500px] md:grid-cols-3">
+                  {PROVINCES.map((p) => (
+                    <Link
+                      key={p.slug}
+                      to={`/sauna/${p.slug}`}
+                      className="block rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                    >
+                      {p.name}
+                    </Link>
+                  ))}
+                </div>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <Link
+                to="/kaart"
+                className="inline-flex h-10 items-center gap-1.5 justify-center rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+              >
+                <Map className="h-4 w-4" /> Kaart
+              </Link>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <Link
+                to="/de-beste-saunas-van-nederland"
+                className="inline-flex h-10 items-center gap-1.5 justify-center rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+              >
+                <Star className="h-4 w-4" /> Top 10
+              </Link>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
 
         {/* Mobile nav */}
         <Sheet>
@@ -41,18 +81,32 @@ const Header = () => {
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right">
+          <SheetContent side="right" className="overflow-y-auto">
             <SheetTitle className="font-serif">Menu</SheetTitle>
-            <nav className="mt-8 flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className="text-lg font-medium text-foreground transition-colors hover:text-primary"
-                >
-                  {link.label}
-                </Link>
-              ))}
+            <nav className="mt-6 flex flex-col gap-3">
+              <Link to="/" className="text-lg font-medium text-foreground hover:text-primary">
+                Home
+              </Link>
+              <Link to="/kaart" className="text-lg font-medium text-foreground hover:text-primary">
+                Kaart
+              </Link>
+              <Link to="/de-beste-saunas-van-nederland" className="text-lg font-medium text-foreground hover:text-primary">
+                Top 10 Sauna's
+              </Link>
+              <div className="mt-2 border-t border-border pt-3">
+                <p className="mb-2 text-sm font-semibold text-muted-foreground uppercase tracking-wide">Provincies</p>
+                <div className="grid grid-cols-2 gap-1">
+                  {PROVINCES.map((p) => (
+                    <Link
+                      key={p.slug}
+                      to={`/sauna/${p.slug}`}
+                      className="rounded-md px-2 py-1.5 text-sm text-foreground hover:text-primary hover:bg-accent"
+                    >
+                      {p.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </nav>
           </SheetContent>
         </Sheet>

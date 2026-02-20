@@ -1,18 +1,18 @@
 import { Link } from "react-router-dom";
-import { MapPin } from "lucide-react";
+import { MapPin, Star, Map } from "lucide-react";
 import { PROVINCES } from "@/lib/provinces";
 
 const Footer = () => (
   <footer className="border-t border-border bg-card">
     <div className="container py-12">
-      <div className="grid gap-8 md:grid-cols-3">
+      <div className="grid gap-8 md:grid-cols-4">
         <div>
           <Link to="/" className="flex items-center gap-2 mb-3">
             <MapPin className="h-5 w-5 text-primary" />
             <span className="font-serif text-lg font-bold">saunaboeken.com</span>
           </Link>
           <p className="text-sm text-muted-foreground">
-            Ontdek de beste sauna's en wellness centra van Nederland.
+            Dé onafhankelijke saunagids van Nederland. Vind, vergelijk en beoordeel sauna's en wellness centra in alle 12 provincies.
           </p>
         </div>
         <div>
@@ -30,18 +30,32 @@ const Footer = () => (
           </div>
         </div>
         <div>
-          <h4 className="font-serif font-semibold mb-3">Links</h4>
+          <h4 className="font-serif font-semibold mb-3">Populaire pagina's</h4>
           <div className="flex flex-col gap-1">
-            <Link to="/kaart" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Kaart
+            <Link to="/de-beste-saunas-van-nederland" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Star className="h-3 w-3" /> Top 10 Sauna's
             </Link>
-            <Link to="/de-beste-saunas-van-nederland" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Top 10 Sauna's
+            <Link to="/kaart" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Map className="h-3 w-3" /> Sauna Kaart
             </Link>
           </div>
-          <h4 className="font-serif font-semibold mb-3 mt-6">Over ons</h4>
+          <h4 className="font-serif font-semibold mb-3 mt-6">Populaire steden</h4>
+          <div className="flex flex-col gap-1">
+            <Link to="/sauna/noord-holland/amsterdam" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              Sauna's in Amsterdam
+            </Link>
+            <Link to="/sauna/zuid-holland/rotterdam" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              Sauna's in Rotterdam
+            </Link>
+            <Link to="/sauna/utrecht/utrecht" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              Sauna's in Utrecht
+            </Link>
+          </div>
+        </div>
+        <div>
+          <h4 className="font-serif font-semibold mb-3">Over Saunaboeken.com</h4>
           <p className="text-sm text-muted-foreground">
-            Saunaboeken.com helpt je de perfecte sauna te vinden. Onafhankelijk en betrouwbaar.
+            Saunaboeken.com helpt je de perfecte sauna te vinden. Onafhankelijk, betrouwbaar en altijd up-to-date. Bekijk reviews van echte bezoekers en vergelijk wellness centra door heel Nederland.
           </p>
         </div>
       </div>
