@@ -87,6 +87,8 @@ const PlaatsPage = () => {
           <p className="text-muted-foreground">Geen sauna's gevonden in deze plaats.</p>
         </div>
       )}
+
+      <AdPlaceholder className="mt-8" />
     </div>
   );
 };

@@ -39,6 +39,10 @@ const Footer = () => (
               Top 10 Sauna's
             </Link>
           </div>
+          <h4 className="font-serif font-semibold mb-3 mt-6">Over ons</h4>
+          <p className="text-sm text-muted-foreground">
+            Saunaboeken.com helpt je de perfecte sauna te vinden. Onafhankelijk en betrouwbaar.
+          </p>
         </div>
       </div>
       <div className="mt-8 border-t border-border pt-6 text-center text-xs text-muted-foreground">

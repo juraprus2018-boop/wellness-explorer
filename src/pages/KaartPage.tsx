@@ -7,6 +7,7 @@ import { Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PROVINCES } from "@/lib/provinces";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import AdPlaceholder from "@/components/AdPlaceholder";
 import "leaflet/dist/leaflet.css";
 
 // Fix default marker icons
@@ -73,6 +74,8 @@ const KaartPage = () => {
         </Select>
       </div>
 
+      <AdPlaceholder className="mb-6" />
+
       <div className="overflow-hidden rounded-lg border border-border" style={{ height: "70vh" }}>
         <MapContainer
           center={center}
@@ -89,13 +92,13 @@ const KaartPage = () => {
               <Popup>
                 <div className="min-w-[180px]">
                   <p className="font-semibold text-sm mb-1">{sauna.name}</p>
-                  <p className="text-xs text-gray-500 mb-1">{sauna.plaatsnaam}, {sauna.provincie}</p>
+                  <p className="text-xs text-muted-foreground mb-1">{sauna.plaatsnaam}, {sauna.provincie}</p>
                   {sauna.average_rating && Number(sauna.average_rating) > 0 && (
                     <p className="text-xs mb-2">⭐ {Number(sauna.average_rating).toFixed(1)} ({sauna.review_count} reviews)</p>
                   )}
                   <a
                     href={`/sauna/${sauna.provincie_slug}/${sauna.plaatsnaam_slug}/${sauna.slug}`}
-                    className="text-xs text-blue-600 hover:underline"
+                    className="text-xs text-primary hover:underline"
                   >
                     Bekijk details →
                   </a>
