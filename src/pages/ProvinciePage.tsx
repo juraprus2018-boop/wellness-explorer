@@ -5,6 +5,7 @@ import { PROVINCES } from "@/lib/provinces";
 import { Card, CardContent } from "@/components/ui/card";
 import AdPlaceholder from "@/components/AdPlaceholder";
 import { supabase } from "@/integrations/supabase/client";
+import SaunaMap from "@/components/SaunaMap";
 
 const ProvinciePage = () => {
   const { provincie } = useParams<{ provincie: string }>();
@@ -18,7 +19,6 @@ const ProvinciePage = () => {
         .select("plaatsnaam, plaatsnaam_slug")
         .eq("provincie_slug", provincie!)
         .order("plaatsnaam");
-      // Group by plaatsnaam
       const map = new Map<string, { name: string; slug: string; count: number }>();
       (data || []).forEach((s) => {
         const existing = map.get(s.plaatsnaam_slug);
@@ -29,6 +29,20 @@ const ProvinciePage = () => {
         }
       });
       return Array.from(map.values());
+    },
+    enabled: !!provincie,
+  });
+
+  const { data: saunasForMap } = useQuery({
+    queryKey: ["saunas-map-provincie", provincie],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("saunas")
+        .select("id, name, slug, plaatsnaam, plaatsnaam_slug, provincie_slug, lat, lng, average_rating, review_count")
+        .eq("provincie_slug", provincie!)
+        .not("lat", "is", null)
+        .not("lng", "is", null);
+      return data || [];
     },
     enabled: !!provincie,
   });
@@ -58,6 +72,13 @@ const ProvinciePage = () => {
       </p>
 
       <AdPlaceholder className="mb-8" />
+
+      {saunasForMap && saunasForMap.length > 0 && (
+        <div className="mb-8">
+          <h2 className="mb-3 font-serif text-xl font-semibold">Kaart</h2>
+          <SaunaMap saunas={saunasForMap} height="350px" />
+        </div>
+      )}
 
       {isLoading ? (
         <div className="flex justify-center py-12">

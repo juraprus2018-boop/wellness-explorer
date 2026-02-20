@@ -1,26 +1,11 @@
 import { Link } from "react-router-dom";
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
-import { Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PROVINCES } from "@/lib/provinces";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AdPlaceholder from "@/components/AdPlaceholder";
-import "leaflet/dist/leaflet.css";
-
-// Fix default marker icons
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
-
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
+import SaunaMap from "@/components/SaunaMap";
 
 const KaartPage = () => {
   const [selectedProvince, setSelectedProvince] = useState<string>("alle");
@@ -42,9 +27,6 @@ const KaartPage = () => {
     if (selectedProvince === "alle") return saunas;
     return saunas.filter((s) => s.provincie_slug === selectedProvince);
   }, [saunas, selectedProvince]);
-
-  // Center of Netherlands
-  const center: [number, number] = [52.2, 5.3];
 
   return (
     <div className="container py-10">
@@ -76,38 +58,7 @@ const KaartPage = () => {
 
       <AdPlaceholder className="mb-6" />
 
-      <div className="overflow-hidden rounded-lg border border-border" style={{ height: "70vh" }}>
-        <MapContainer
-          center={center}
-          zoom={8}
-          style={{ height: "100%", width: "100%" }}
-          scrollWheelZoom={true}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          {filteredSaunas.map((sauna) => (
-            <Marker key={sauna.id} position={[sauna.lat!, sauna.lng!]}>
-              <Popup>
-                <div className="min-w-[180px]">
-                  <p className="font-semibold text-sm mb-1">{sauna.name}</p>
-                  <p className="text-xs text-muted-foreground mb-1">{sauna.plaatsnaam}, {sauna.provincie}</p>
-                  {sauna.average_rating && Number(sauna.average_rating) > 0 && (
-                    <p className="text-xs mb-2">⭐ {Number(sauna.average_rating).toFixed(1)} ({sauna.review_count} reviews)</p>
-                  )}
-                  <a
-                    href={`/sauna/${sauna.provincie_slug}/${sauna.plaatsnaam_slug}/${sauna.slug}`}
-                    className="text-xs text-primary hover:underline"
-                  >
-                    Bekijk details →
-                  </a>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
-      </div>
+      <SaunaMap saunas={filteredSaunas} height="70vh" />
     </div>
   );
 };
