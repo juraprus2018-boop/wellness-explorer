@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { MapPin, Phone, Globe, Star, Clock, ArrowRight } from "lucide-react";
+import { MapPin, Phone, Globe, Star, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +7,9 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import AdPlaceholder from "@/components/AdPlaceholder";
 import ReviewForm from "@/components/ReviewForm";
 import SEOHead from "@/components/SEOHead";
+import SafeSaunaMap from "@/components/SafeSaunaMap";
+import SaunaOpeningHours from "@/components/SaunaOpeningHours";
+import SaunaFAQ from "@/components/SaunaFAQ";
 import { supabase } from "@/integrations/supabase/client";
 import { PROVINCES } from "@/lib/provinces";
 
@@ -46,17 +49,28 @@ const SaunaDetailPage = () => {
     enabled: !!sauna?.id,
   });
 
-  const { data: relatedSaunas } = useQuery({
-    queryKey: ["related-saunas", provincie, plaatsnaam, sauna?.id],
+  const { data: nearbySaunas } = useQuery({
+    queryKey: ["nearby-saunas", provincie, plaatsnaam, sauna?.id],
     queryFn: async () => {
-      const { data } = await supabase
+      // First try same city
+      const { data: sameCity } = await supabase
         .from("saunas")
-        .select("id, name, slug, average_rating")
-        .eq("provincie_slug", provincie!)
+        .select("id, name, slug, average_rating, review_count, photo_urls, plaatsnaam, plaatsnaam_slug, lat, lng, address")
         .eq("plaatsnaam_slug", plaatsnaam!)
         .neq("id", sauna!.id)
-        .limit(5);
-      return data || [];
+        .limit(6);
+
+      if (sameCity && sameCity.length >= 3) return sameCity;
+
+      // Fallback: same province
+      const { data: sameProvince } = await supabase
+        .from("saunas")
+        .select("id, name, slug, average_rating, review_count, photo_urls, plaatsnaam, plaatsnaam_slug, lat, lng, address")
+        .eq("provincie_slug", provincie!)
+        .neq("id", sauna!.id)
+        .limit(6);
+
+      return [...(sameCity || []), ...(sameProvince || [])].slice(0, 6);
     },
     enabled: !!sauna?.id,
   });
@@ -83,6 +97,10 @@ const SaunaDetailPage = () => {
   const openingHours = sauna.opening_hours as string[] | null;
   const rating = sauna.average_rating != null ? Number(sauna.average_rating) : 0;
 
+  const saunasForMap = sauna.lat && sauna.lng
+    ? [{ id: sauna.id, name: sauna.name, lat: sauna.lat, lng: sauna.lng, slug: sauna.slug, plaatsnaam_slug: plaatsnaam!, provincie_slug: provincie! }]
+    : [];
+
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -98,7 +116,7 @@ const SaunaDetailPage = () => {
       "@context": "https://schema.org",
       "@type": "HealthAndBeautyBusiness",
       name: sauna.name,
-      description: sauna.description || `${sauna.name} is een sauna en wellness centrum in ${sauna.plaatsnaam}, ${sauna.provincie}.`,
+      description: sauna.description || `${sauna.name} is een sauna en wellness centrum in ${sauna.plaatsnaam}, ${sauna.provincie}. Boek nu je saunabezoek.`,
       url: `https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}/${slug}`,
       ...(sauna.website && { sameAs: sauna.website }),
       address: {
@@ -140,11 +158,11 @@ const SaunaDetailPage = () => {
 
       {/* Full-width hero banner */}
       {sauna.photo_urls && sauna.photo_urls.length > 0 ? (
-        <div className="relative w-full">
+        <div className="relative w-full overflow-hidden">
           <Carousel className="w-full">
-            <CarouselContent>
+            <CarouselContent className="-ml-0">
               {sauna.photo_urls.map((url, i) => (
-                <CarouselItem key={i}>
+                <CarouselItem key={i} className="pl-0">
                   <div className="relative h-[35vh] sm:h-[45vh] md:h-[55vh] w-full">
                     <img
                       src={url}
@@ -164,28 +182,28 @@ const SaunaDetailPage = () => {
               </>
             )}
           </Carousel>
-          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+          <div className="absolute bottom-0 left-0 right-0 p-4 md:p-10">
             <div className="container">
               <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
                 {sauna.name}
               </h1>
               <p className="mt-1 flex items-center gap-2 text-white/85 text-sm sm:text-base drop-shadow">
-                <MapPin className="h-4 w-4" />
+                <MapPin className="h-4 w-4 shrink-0" />
                 {sauna.plaatsnaam}, {sauna.provincie}
               </p>
             </div>
           </div>
         </div>
       ) : (
-        <div className="relative h-[30vh] w-full bg-muted flex items-center justify-center">
+        <div className="relative h-[30vh] w-full bg-muted flex items-center justify-center overflow-hidden">
           <MapPin className="h-12 w-12 text-muted-foreground/30" />
-          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 bg-gradient-to-t from-foreground/40 to-transparent">
+          <div className="absolute bottom-0 left-0 right-0 p-4 md:p-10 bg-gradient-to-t from-foreground/40 to-transparent">
             <div className="container">
               <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-white">
                 {sauna.name}
               </h1>
               <p className="mt-1 flex items-center gap-2 text-white/85 text-sm">
-                <MapPin className="h-4 w-4" />
+                <MapPin className="h-4 w-4 shrink-0" />
                 {sauna.plaatsnaam}, {sauna.provincie}
               </p>
             </div>
@@ -193,93 +211,80 @@ const SaunaDetailPage = () => {
         </div>
       )}
 
-      <div className="container py-8">
-        <nav className="mb-6 text-sm text-muted-foreground">
+      <div className="container py-8 overflow-x-hidden">
+        <nav className="mb-6 text-sm text-muted-foreground flex flex-wrap gap-1">
           <Link to="/" className="hover:text-primary">Home</Link>
-          <span className="mx-2">/</span>
+          <span>/</span>
           <Link to={`/sauna/${provincie}`} className="hover:text-primary">{province?.name || provincie}</Link>
-          <span className="mx-2">/</span>
+          <span>/</span>
           <Link to={`/sauna/${provincie}/${plaatsnaam}`} className="hover:text-primary">{sauna.plaatsnaam}</Link>
-          <span className="mx-2">/</span>
+          <span>/</span>
           <span className="text-foreground">{sauna.name}</span>
         </nav>
 
         <div className="grid gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
-            {/* Info cards */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Card>
-                <CardContent className="flex items-center gap-3 p-4">
-                  <MapPin className="h-5 w-5 shrink-0 text-primary" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Adres</p>
-                    <p className="font-medium">{sauna.address || `${sauna.plaatsnaam}, ${sauna.provincie}`}</p>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="flex items-center gap-3 p-4">
-                  <Clock className="h-5 w-5 shrink-0 text-primary" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Openingstijden</p>
-                    {openingHours && openingHours.length > 0 ? (
-                      <div className="text-sm font-medium">
-                        {openingHours.map((line, i) => (
-                          <p key={i}>{line}</p>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="font-medium">Niet beschikbaar</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-              {sauna.phone && (
-                <Card>
-                  <CardContent className="flex items-center gap-3 p-4">
-                    <Phone className="h-5 w-5 shrink-0 text-primary" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">Telefoon</p>
-                      <a href={`tel:${sauna.phone}`} className="font-medium text-primary hover:underline">
-                        {sauna.phone}
-                      </a>
-                    </div>
-                  </CardContent>
-                </Card>
+          <div className="lg:col-span-2 space-y-6 min-w-0">
+            {/* Quick info row */}
+            <div className="flex flex-wrap gap-3">
+              {rating > 0 && (
+                <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-medium">
+                  <Star className="h-4 w-4 text-warm-gold fill-current" />
+                  {rating.toFixed(1)} / 5
+                  <span className="text-muted-foreground">({sauna.review_count} reviews)</span>
+                </div>
               )}
-              <Card>
-                <CardContent className="flex items-center gap-3 p-4">
-                  <Star className="h-5 w-5 shrink-0 text-warm-gold" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Beoordeling</p>
-                    <p className="font-medium">
-                      {rating > 0
-                        ? `${rating.toFixed(1)} / 5 (${sauna.review_count} reviews)`
-                        : "Nog geen reviews"}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-sm">
+                <MapPin className="h-4 w-4 text-primary shrink-0" />
+                <span className="truncate">{sauna.address || `${sauna.plaatsnaam}, ${sauna.provincie}`}</span>
+              </div>
+              {sauna.phone && (
+                <a href={`tel:${sauna.phone}`} className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-sm hover:bg-primary/10 transition-colors">
+                  <Phone className="h-4 w-4 text-primary shrink-0" />
+                  {sauna.phone}
+                </a>
+              )}
             </div>
-
-            {/* Description */}
-            {sauna.description && (
-              <Card>
-                <CardHeader><CardTitle className="font-serif">Over {sauna.name}</CardTitle></CardHeader>
-                <CardContent><p className="text-muted-foreground">{sauna.description}</p></CardContent>
-              </Card>
-            )}
 
             {/* CTA */}
             {sauna.website && (
               <Button size="lg" className="w-full sm:w-auto" asChild>
-              <a href={sauna.website} target="_blank" rel="noopener noreferrer">
+                <a href={sauna.website} target="_blank" rel="noopener noreferrer">
                   <Globe className="mr-2 h-4 w-4" /> Sauna boeken
                 </a>
               </Button>
             )}
 
-            <AdPlaceholder className="mt-6" />
+            {/* Description */}
+            {sauna.description && (
+              <Card>
+                <CardHeader><CardTitle className="font-serif">Over {sauna.name}</CardTitle></CardHeader>
+                <CardContent><p className="text-muted-foreground leading-relaxed">{sauna.description}</p></CardContent>
+              </Card>
+            )}
+
+            {/* Opening hours */}
+            <Card>
+              <CardContent className="p-5">
+                <SaunaOpeningHours openingHours={openingHours} />
+              </CardContent>
+            </Card>
+
+            {/* Map */}
+            {saunasForMap.length > 0 && (
+              <Card>
+                <CardHeader><CardTitle className="font-serif text-lg">Locatie</CardTitle></CardHeader>
+                <CardContent>
+                  <SafeSaunaMap saunas={saunasForMap} height="300px" className="rounded-lg overflow-hidden" />
+                  {sauna.address && (
+                    <p className="mt-3 text-sm text-muted-foreground flex items-center gap-2">
+                      <MapPin className="h-4 w-4 shrink-0" /> {sauna.address}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            <AdPlaceholder sectionKey="detail_mid" />
 
             {/* Reviews */}
             <Card>
@@ -318,38 +323,25 @@ const SaunaDetailPage = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* FAQ */}
+            <Card>
+              <CardContent className="p-5">
+                <SaunaFAQ
+                  saunaName={sauna.name}
+                  plaatsnaam={sauna.plaatsnaam}
+                  provincie={sauna.provincie}
+                  phone={sauna.phone}
+                  website={sauna.website}
+                  hasOpeningHours={!!(openingHours && openingHours.length > 0)}
+                />
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
-            <AdPlaceholder />
-            {relatedSaunas && relatedSaunas.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="font-serif text-lg">Meer sauna's in {sauna.plaatsnaam}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {relatedSaunas.map((r) => (
-                    <Link
-                      key={r.id}
-                      to={`/sauna/${provincie}/${plaatsnaam}/${r.slug}`}
-                      className="flex items-center justify-between rounded-lg p-2 hover:bg-muted transition-colors"
-                    >
-                      <span className="text-sm font-medium truncate">{r.name}</span>
-                      <div className="flex items-center gap-1 shrink-0">
-                        {r.average_rating != null && Number(r.average_rating) > 0 && (
-                          <>
-                            <Star className="h-3 w-3 text-warm-gold fill-current" />
-                            <span className="text-xs">{Number(r.average_rating).toFixed(1)}</span>
-                          </>
-                        )}
-                        <ArrowRight className="h-3 w-3 text-muted-foreground ml-1" />
-                      </div>
-                    </Link>
-                  ))}
-                </CardContent>
-              </Card>
-            )}
+          <div className="space-y-6 min-w-0">
+            <AdPlaceholder sectionKey="detail_sidebar" />
 
             {/* Internal links sidebar */}
             <Card>
@@ -359,6 +351,9 @@ const SaunaDetailPage = () => {
               <CardContent className="space-y-2">
                 <Link to={`/sauna/${provincie}`} className="block text-sm text-muted-foreground hover:text-primary">
                   Sauna boeken in {province?.name || provincie}
+                </Link>
+                <Link to={`/sauna/${provincie}/${plaatsnaam}`} className="block text-sm text-muted-foreground hover:text-primary">
+                  Alle sauna's in {sauna.plaatsnaam}
                 </Link>
                 <Link to="/de-beste-saunas-van-nederland" className="block text-sm text-muted-foreground hover:text-primary">
                   Top 10 sauna's om te boeken
@@ -370,6 +365,80 @@ const SaunaDetailPage = () => {
             </Card>
           </div>
         </div>
+
+        {/* Nearby saunas - full width section */}
+        {nearbySaunas && nearbySaunas.length > 0 && (
+          <section className="mt-12 border-t border-border pt-8">
+            <h2 className="font-serif text-2xl font-bold mb-2">Sauna's in de buurt van {sauna.name}</h2>
+            <p className="text-muted-foreground mb-6">
+              Ook een sauna boeken in de buurt? Bekijk deze sauna's in {sauna.plaatsnaam} en omgeving.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {nearbySaunas.map((nearby) => (
+                <Link key={nearby.id} to={`/sauna/${provincie}/${nearby.plaatsnaam_slug}/${nearby.slug}`}>
+                  <Card className="group cursor-pointer overflow-hidden transition-all hover:shadow-lg h-full">
+                    <div className="aspect-[16/10] bg-muted">
+                      {nearby.photo_urls && nearby.photo_urls[0] ? (
+                        <img
+                          src={nearby.photo_urls[0]}
+                          alt={`${nearby.name} in ${nearby.plaatsnaam}`}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center">
+                          <MapPin className="h-8 w-8 text-muted-foreground/30" />
+                        </div>
+                      )}
+                    </div>
+                    <CardContent className="p-4">
+                      <h3 className="font-serif font-semibold truncate">{nearby.name}</h3>
+                      <p className="text-xs text-muted-foreground truncate">{nearby.plaatsnaam}</p>
+                      <div className="mt-2 flex items-center justify-between">
+                        {nearby.average_rating && Number(nearby.average_rating) > 0 ? (
+                          <div className="flex items-center gap-1 text-warm-gold">
+                            <Star className="h-3.5 w-3.5 fill-current" />
+                            <span className="text-sm font-medium">{Number(nearby.average_rating).toFixed(1)}</span>
+                            <span className="text-xs text-muted-foreground">({nearby.review_count})</span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">Geen reviews</span>
+                        )}
+                        <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* SEO text */}
+        <section className="mt-12 border-t border-border pt-8">
+          <h2 className="font-serif text-xl font-semibold mb-3">Sauna boeken bij {sauna.name} in {sauna.plaatsnaam}</h2>
+          <div className="prose prose-sm max-w-none text-muted-foreground space-y-3">
+            <p>
+              Ben je op zoek naar de perfecte plek om een sauna te boeken in {sauna.plaatsnaam}? {sauna.name} biedt een
+              heerlijke wellness ervaring in het hart van {sauna.provincie}. Of je nu komt voor een ontspannende dag,
+              een romantisch uitje of gewoon even wilt ontsnappen aan de dagelijkse drukte — bij {sauna.name} ben je
+              aan het juiste adres.
+            </p>
+            <p>
+              Vergelijk {sauna.name} met andere sauna's in{" "}
+              <Link to={`/sauna/${provincie}/${plaatsnaam}`} className="text-primary hover:underline">
+                {sauna.plaatsnaam}
+              </Link>{" "}
+              en{" "}
+              <Link to={`/sauna/${provincie}`} className="text-primary hover:underline">
+                {province?.name || provincie}
+              </Link>
+              . Bekijk reviews van andere bezoekers en boek direct de sauna die bij jou past.
+            </p>
+          </div>
+        </section>
+
+        <AdPlaceholder sectionKey="detail_bottom" className="mt-8" />
       </div>
     </>
   );
