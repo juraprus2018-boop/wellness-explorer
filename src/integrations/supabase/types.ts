@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_settings: {
+        Row: {
+          ad_client: string | null
+          ad_slot: string | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          section_key: string
+          section_label: string
+          updated_at: string
+        }
+        Insert: {
+          ad_client?: string | null
+          ad_slot?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          section_key: string
+          section_label: string
+          updated_at?: string
+        }
+        Update: {
+          ad_client?: string | null
+          ad_slot?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          section_key?: string
+          section_label?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           created_at: string
