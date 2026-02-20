@@ -1,13 +1,106 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Link } from "react-router-dom";
+import { Search, Star, MapPin, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { PROVINCES } from "@/lib/provinces";
+import AdPlaceholder from "@/components/AdPlaceholder";
+import heroImage from "@/assets/hero-sauna.jpg";
 
 const Index = () => {
+  const [search, setSearch] = useState("");
+
+  const filteredProvinces = PROVINCES.filter((p) =>
+    p.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <>
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src={heroImage}
+            alt="Sfeervolle sauna"
+            className="h-full w-full object-cover"
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-foreground/60 via-foreground/40 to-background" />
+        </div>
+        <div className="container relative flex flex-col items-center py-24 text-center md:py-36">
+          <h1 className="mb-4 max-w-3xl text-4xl font-bold text-white md:text-5xl lg:text-6xl font-serif">
+            Ontdek de beste sauna's van Nederland
+          </h1>
+          <p className="mb-8 max-w-xl text-lg text-white/85">
+            Vind en vergelijk wellness centra bij jou in de buurt. Lees reviews en boek direct.
+          </p>
+          <div className="flex w-full max-w-md gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Zoek op provincie of plaats..."
+                className="pl-10 bg-background/95"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <Button>Zoeken</Button>
+          </div>
+        </div>
+      </section>
+
+      <AdPlaceholder className="container mt-6" />
+
+      {/* Provincies overzicht */}
+      <section className="container py-16">
+        <h2 className="mb-2 text-center font-serif text-3xl font-bold">
+          Sauna's per provincie
+        </h2>
+        <p className="mb-10 text-center text-muted-foreground">
+          Kies een provincie om alle wellness locaties te bekijken
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {filteredProvinces.map((province, i) => (
+            <Link key={province.slug} to={`/sauna/${province.slug}`}>
+              <Card className="group cursor-pointer transition-all hover:shadow-lg hover:border-primary/30"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <CardContent className="flex items-center justify-between p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                      <MapPin className="h-5 w-5 text-primary" />
+                    </div>
+                    <span className="font-medium">{province.name}</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Top Sauna's teaser */}
+      <section className="bg-card py-16">
+        <div className="container text-center">
+          <Star className="mx-auto mb-4 h-10 w-10 text-warm-gold" />
+          <h2 className="mb-2 font-serif text-3xl font-bold">
+            De beste sauna's van Nederland
+          </h2>
+          <p className="mb-6 text-muted-foreground">
+            Bekijk onze top 10 van de meest gewaardeerde wellness centra
+          </p>
+          <Button asChild size="lg">
+            <Link to="/de-beste-saunas-van-nederland">
+              Bekijk Top 10 <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+      </section>
+
+      <AdPlaceholder className="container my-6" />
+    </>
   );
 };
 
