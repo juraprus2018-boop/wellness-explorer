@@ -23,13 +23,14 @@ serve(async (req) => {
       throw new Error('GOOGLE_PLACES_API_KEY is not configured');
     }
 
-    const { action, query, placeId } = await req.json();
+    const { action, query, placeId, lat, lng, radius, pageToken } = await req.json();
 
+    // Text search (existing)
     if (action === 'search') {
       const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=sauna+${encodeURIComponent(query)}&language=nl&region=nl&key=${GOOGLE_PLACES_API_KEY}`;
       const response = await fetch(url);
       const data = await response.json();
-      console.log('Google Places raw response status:', data.status, 'results count:', (data.results || []).length, 'error_message:', data.error_message || 'none');
+      console.log('Google Places search status:', data.status, 'results:', (data.results || []).length);
 
       const results = (data.results || []).map((place: any) => ({
         place_id: place.place_id,
@@ -40,11 +41,41 @@ serve(async (req) => {
         lng: place.geometry?.location?.lng,
       }));
 
-      return new Response(JSON.stringify({ results }), {
+      return new Response(JSON.stringify({ results, next_page_token: data.next_page_token || null }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
+    // Nearby search with lat/lng/radius + pagination
+    if (action === 'nearby') {
+      let url: string;
+      if (pageToken) {
+        // Pagination: only pagetoken + key needed
+        url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?pagetoken=${encodeURIComponent(pageToken)}&key=${GOOGLE_PLACES_API_KEY}`;
+      } else {
+        const r = radius || 10000; // default 10km
+        url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${r}&keyword=sauna&language=nl&key=${GOOGLE_PLACES_API_KEY}`;
+      }
+
+      const response = await fetch(url);
+      const data = await response.json();
+      console.log('Google Places nearby status:', data.status, 'results:', (data.results || []).length, 'has_next:', !!data.next_page_token);
+
+      const results = (data.results || []).map((place: any) => ({
+        place_id: place.place_id,
+        name: place.name,
+        address: place.vicinity || place.formatted_address,
+        rating: place.rating,
+        lat: place.geometry?.location?.lat,
+        lng: place.geometry?.location?.lng,
+      }));
+
+      return new Response(JSON.stringify({ results, next_page_token: data.next_page_token || null }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Place details (existing)
     if (action === 'details') {
       const fields = 'name,formatted_address,formatted_phone_number,website,opening_hours,geometry,photos,rating,address_components';
       const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(placeId)}&fields=${fields}&language=nl&key=${GOOGLE_PLACES_API_KEY}`;
@@ -67,7 +98,7 @@ serve(async (req) => {
         }
       }
 
-      // Download photos to Supabase Storage with SEO-friendly names
+      // Download photos to Supabase Storage
       const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
       const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
       const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -89,16 +120,11 @@ serve(async (req) => {
           const photoBuffer = await photoResponse.arrayBuffer();
           const contentType = photoResponse.headers.get('content-type') || 'image/jpeg';
           const ext = contentType.includes('png') ? 'png' : 'jpg';
-
-          // SEO-friendly path: sauna-name-plaatsnaam/sauna-name-plaatsnaam-1.jpg
           const fileName = `${saunaSlug}-${plaatsnaamSlug}/${saunaSlug}-${plaatsnaamSlug}-${i + 1}.${ext}`;
 
           const { error: uploadError } = await supabase.storage
             .from('sauna-photos')
-            .upload(fileName, photoBuffer, {
-              contentType,
-              upsert: true,
-            });
+            .upload(fileName, photoBuffer, { contentType, upsert: true });
 
           if (uploadError) {
             console.error(`Failed to upload photo ${i}:`, uploadError.message);
@@ -135,7 +161,7 @@ serve(async (req) => {
       });
     }
 
-    throw new Error('Invalid action. Use "search" or "details".');
+    throw new Error('Invalid action. Use "search", "nearby", or "details".');
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('Google Places API error:', message);
