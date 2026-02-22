@@ -15,6 +15,7 @@ import KaartPage from "./pages/KaartPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminAddSaunaPage from "./pages/admin/AdminAddSaunaPage";
+import AdminMapImportPage from "./pages/admin/AdminMapImportPage";
 import AdminTop10Page from "./pages/admin/AdminTop10Page";
 import AdminSaunasPage from "./pages/admin/AdminSaunasPage";
 import AdminEditSaunaPage from "./pages/admin/AdminEditSaunaPage";
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboardPage /></AdminGuard>} />
             <Route path="/admin/saunas/toevoegen" element={<AdminGuard><AdminAddSaunaPage /></AdminGuard>} />
+            <Route path="/admin/saunas/kaart-import" element={<AdminGuard><AdminMapImportPage /></AdminGuard>} />
             <Route path="/admin/saunas" element={<AdminGuard><AdminSaunasPage /></AdminGuard>} />
             <Route path="/admin/saunas/:id/bewerken" element={<AdminGuard><AdminEditSaunaPage /></AdminGuard>} />
             <Route path="/admin/advertenties" element={<AdminGuard><AdminAdsPage /></AdminGuard>} />

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Plus, List, Trophy, LogOut, Megaphone } from "lucide-react";
+import { Plus, List, Trophy, LogOut, Megaphone, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
@@ -64,6 +64,19 @@ const AdminDashboardPage = () => {
               <CardContent>
                 <p className="text-sm text-muted-foreground">
                   Bepaal de volgorde van de top 10
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to="/admin/saunas/kaart-import">
+            <Card className="cursor-pointer transition-all hover:shadow-lg hover:border-primary/30">
+              <CardHeader>
+                <Map className="h-8 w-8 text-primary" />
+                <CardTitle className="font-serif">Kaart importeren</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Klik op de kaart, kies een straal en importeer tot 60 sauna's
                 </p>
               </CardContent>
             </Card>
