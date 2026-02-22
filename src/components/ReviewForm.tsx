@@ -21,6 +21,7 @@ const reviewSchema = z.object({
 
 interface ReviewFormProps {
   saunaId: string;
+  saunaName?: string;
 }
 
 declare global {
@@ -29,7 +30,7 @@ declare global {
   }
 }
 
-const ReviewForm = ({ saunaId }: ReviewFormProps) => {
+const ReviewForm = ({ saunaId, saunaName }: ReviewFormProps) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [rating, setRating] = useState(0);
@@ -149,6 +150,20 @@ const ReviewForm = ({ saunaId }: ReviewFormProps) => {
       window.grecaptcha?.reset(recaptchaWidgetId.current);
       return;
     }
+
+    // Send admin notification (fire and forget)
+    supabase.functions.invoke("send-email", {
+      body: {
+        type: "review",
+        data: {
+          sauna_name: saunaName || "Onbekend",
+          reviewer_name: result.data.reviewer_name,
+          reviewer_email: result.data.reviewer_email,
+          rating: result.data.rating,
+          review_text: result.data.review_text || "",
+        },
+      },
+    }).catch(() => {});
 
     toast({ title: "Review geplaatst!", description: "Bedankt voor je beoordeling." });
     setName("");

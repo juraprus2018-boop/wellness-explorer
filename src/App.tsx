@@ -12,6 +12,7 @@ import PlaatsPage from "./pages/PlaatsPage";
 import SaunaDetailPage from "./pages/SaunaDetailPage";
 import Top10Page from "./pages/Top10Page";
 import KaartPage from "./pages/KaartPage";
+import ContactPage from "./pages/ContactPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminAddSaunaPage from "./pages/admin/AdminAddSaunaPage";
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="/sauna/:provincie/:plaatsnaam/:slug" element={<SaunaDetailPage />} />
               <Route path="/de-beste-saunas-van-nederland" element={<Top10Page />} />
               <Route path="/kaart" element={<KaartPage />} />
+              <Route path="/contact" element={<ContactPage />} />
             </Route>
 
             {/* Admin routes */}
