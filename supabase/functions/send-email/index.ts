@@ -1,9 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { SmtpClient } from "https://deno.land/x/smtp@v0.7.0/mod.ts";
+import nodemailer from "npm:nodemailer@6.9.16";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 const SMTP_HOST = "saunaboeken.com";
@@ -28,7 +28,6 @@ serve(async (req) => {
     let htmlBody = "";
 
     if (type === "contact") {
-      // Contact form submission
       subject = `Nieuw contactformulier: ${data.subject || "Geen onderwerp"}`;
       htmlBody = `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
@@ -44,7 +43,6 @@ serve(async (req) => {
         </div>
       `;
     } else if (type === "review") {
-      // New review notification
       subject = `Nieuwe review: ${data.sauna_name} — ${data.rating}⭐`;
       htmlBody = `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
@@ -61,23 +59,22 @@ serve(async (req) => {
       throw new Error("Invalid email type");
     }
 
-    const client = new SmtpClient();
-    await client.connectTLS({
-      hostname: SMTP_HOST,
+    const transporter = nodemailer.createTransport({
+      host: SMTP_HOST,
       port: SMTP_PORT,
-      username: SMTP_USER,
-      password: SMTP_PASSWORD,
+      secure: true, // SSL on port 465
+      auth: {
+        user: SMTP_USER,
+        pass: SMTP_PASSWORD,
+      },
     });
 
-    await client.send({
-      from: SMTP_USER,
+    await transporter.sendMail({
+      from: `"Saunaboeken.com" <${SMTP_USER}>`,
       to: ADMIN_EMAIL,
       subject,
-      content: htmlBody,
       html: htmlBody,
     });
-
-    await client.close();
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
