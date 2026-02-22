@@ -115,10 +115,10 @@ const SaunaMap = ({ saunas, height = "400px", className = "" }: SaunaMapProps) =
 
   return (
     <div
-      className={`overflow-hidden rounded-lg border border-border ${className}`}
+      className={`overflow-hidden rounded-lg border border-border relative z-0 ${className}`}
       style={{ height }}
     >
-      <div ref={containerRef} style={{ height: "100%", width: "100%" }} />
+      <div ref={containerRef} style={{ height: "100%", width: "100%", zIndex: 0 }} />
     </div>
   );
 };
