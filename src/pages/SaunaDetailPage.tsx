@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
-import { MapPin, Phone, Globe, Star, ArrowRight } from "lucide-react";
+import { MapPin, Phone, Globe, Star, ArrowRight, Navigation } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -12,6 +13,14 @@ import SaunaOpeningHours from "@/components/SaunaOpeningHours";
 import SaunaFAQ from "@/components/SaunaFAQ";
 import { supabase } from "@/integrations/supabase/client";
 import { PROVINCES } from "@/lib/provinces";
+
+function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
 const SaunaDetailPage = () => {
   const { provincie, plaatsnaam, slug } = useParams<{
@@ -49,31 +58,48 @@ const SaunaDetailPage = () => {
     enabled: !!sauna?.id,
   });
 
-  const { data: nearbySaunas } = useQuery({
-    queryKey: ["nearby-saunas", provincie, plaatsnaam, sauna?.id],
+  // Fetch ALL saunas with coordinates for distance-based nearby
+  const { data: allSaunasRaw } = useQuery({
+    queryKey: ["all-saunas-coords"],
     queryFn: async () => {
-      // First try same city
-      const { data: sameCity } = await supabase
+      const { data } = await supabase
         .from("saunas")
-        .select("id, name, slug, average_rating, review_count, photo_urls, plaatsnaam, plaatsnaam_slug, lat, lng, address")
-        .eq("plaatsnaam_slug", plaatsnaam!)
-        .neq("id", sauna!.id)
-        .limit(6);
+        .select("id, name, slug, average_rating, review_count, photo_urls, plaatsnaam, plaatsnaam_slug, provincie_slug, lat, lng, address")
+        .not("lat", "is", null)
+        .not("lng", "is", null);
+      return data || [];
+    },
+    enabled: !!sauna?.id && !!sauna?.lat && !!sauna?.lng,
+  });
 
-      if (sameCity && sameCity.length >= 3) return sameCity;
+  const nearbySaunas = useMemo(() => {
+    if (!allSaunasRaw || !sauna?.lat || !sauna?.lng) return [];
+    return allSaunasRaw
+      .filter((s) => s.id !== sauna.id)
+      .map((s) => ({
+        ...s,
+        distance: haversineDistance(sauna.lat!, sauna.lng!, s.lat!, s.lng!),
+      }))
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, 6);
+  }, [allSaunasRaw, sauna]);
 
-      // Fallback: same province
+  // Fallback nearby for saunas without coords
+  const { data: nearbySaunasFallback } = useQuery({
+    queryKey: ["nearby-saunas-fallback", provincie, plaatsnaam, sauna?.id],
+    queryFn: async () => {
       const { data: sameProvince } = await supabase
         .from("saunas")
-        .select("id, name, slug, average_rating, review_count, photo_urls, plaatsnaam, plaatsnaam_slug, lat, lng, address")
+        .select("id, name, slug, average_rating, review_count, photo_urls, plaatsnaam, plaatsnaam_slug, provincie_slug, lat, lng, address")
         .eq("provincie_slug", provincie!)
         .neq("id", sauna!.id)
         .limit(6);
-
-      return [...(sameCity || []), ...(sameProvince || [])].slice(0, 6);
+      return sameProvince || [];
     },
-    enabled: !!sauna?.id,
+    enabled: !!sauna?.id && (!sauna?.lat || !sauna?.lng),
   });
+
+  const displayNearby = nearbySaunas.length > 0 ? nearbySaunas : nearbySaunasFallback || [];
 
   if (isLoading) {
     return (
@@ -366,16 +392,19 @@ const SaunaDetailPage = () => {
           </div>
         </div>
 
-        {/* Nearby saunas - full width section */}
-        {nearbySaunas && nearbySaunas.length > 0 && (
+        {/* Nearby saunas - distance based */}
+        {displayNearby.length > 0 && (
           <section className="mt-12 border-t border-border pt-8">
-            <h2 className="font-serif text-2xl font-bold mb-2">Sauna's in de buurt van {sauna.name}</h2>
+            <div className="flex items-center gap-2 mb-2">
+              <Navigation className="h-5 w-5 text-primary" />
+              <h2 className="font-serif text-2xl font-bold">Sauna's & wellness in de buurt</h2>
+            </div>
             <p className="text-muted-foreground mb-6">
-              Ook een sauna boeken in de buurt? Bekijk deze sauna's in {sauna.plaatsnaam} en omgeving.
+              Ontdek de dichtstbijzijnde sauna's en wellness centra bij {sauna.name}.
             </p>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {nearbySaunas.map((nearby) => (
-                <Link key={nearby.id} to={`/sauna/${provincie}/${nearby.plaatsnaam_slug}/${nearby.slug}`}>
+              {displayNearby.map((nearby) => (
+                <Link key={nearby.id} to={`/sauna/${nearby.provincie_slug}/${nearby.plaatsnaam_slug}/${nearby.slug}`}>
                   <Card className="group cursor-pointer overflow-hidden transition-all hover:shadow-lg h-full">
                     <div className="aspect-[16/10] bg-muted">
                       {nearby.photo_urls && nearby.photo_urls[0] ? (
@@ -393,7 +422,10 @@ const SaunaDetailPage = () => {
                     </div>
                     <CardContent className="p-4">
                       <h3 className="font-serif font-semibold truncate">{nearby.name}</h3>
-                      <p className="text-xs text-muted-foreground truncate">{nearby.plaatsnaam}</p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {nearby.plaatsnaam}
+                        {"distance" in nearby && ` — ${(nearby as any).distance.toFixed(1)} km`}
+                      </p>
                       <div className="mt-2 flex items-center justify-between">
                         {nearby.average_rating && Number(nearby.average_rating) > 0 ? (
                           <div className="flex items-center gap-1 text-warm-gold">

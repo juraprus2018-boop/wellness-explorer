@@ -1,18 +1,20 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { MapPin, Menu, ChevronDown, Star, Map, Mail } from "lucide-react";
+import { MapPin, Menu, Star, Map, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { PROVINCES } from "@/lib/provinces";
 
 const Header = () => {
+  const [open, setOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container flex h-16 items-center justify-between">
@@ -84,7 +86,7 @@ const Header = () => {
         </NavigationMenu>
 
         {/* Mobile nav */}
-        <Sheet>
+        <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" size="icon">
               <Menu className="h-5 w-5" />
@@ -93,16 +95,16 @@ const Header = () => {
           <SheetContent side="right" className="overflow-y-auto">
             <SheetTitle className="font-serif">Menu</SheetTitle>
             <nav className="mt-6 flex flex-col gap-3">
-              <Link to="/" className="text-lg font-medium text-foreground hover:text-primary">
+              <Link to="/" className="text-lg font-medium text-foreground hover:text-primary" onClick={() => setOpen(false)}>
                 Home
               </Link>
-              <Link to="/kaart" className="text-lg font-medium text-foreground hover:text-primary">
+              <Link to="/kaart" className="text-lg font-medium text-foreground hover:text-primary" onClick={() => setOpen(false)}>
                 Kaart
               </Link>
-              <Link to="/de-beste-saunas-van-nederland" className="text-lg font-medium text-foreground hover:text-primary">
+              <Link to="/de-beste-saunas-van-nederland" className="text-lg font-medium text-foreground hover:text-primary" onClick={() => setOpen(false)}>
                 Top 10 Sauna's
               </Link>
-              <Link to="/contact" className="text-lg font-medium text-foreground hover:text-primary">
+              <Link to="/contact" className="text-lg font-medium text-foreground hover:text-primary" onClick={() => setOpen(false)}>
                 Contact
               </Link>
               <div className="mt-2 border-t border-border pt-3">
@@ -113,6 +115,7 @@ const Header = () => {
                       key={p.slug}
                       to={`/sauna/${p.slug}`}
                       className="rounded-md px-2 py-1.5 text-sm text-foreground hover:text-primary hover:bg-accent"
+                      onClick={() => setOpen(false)}
                     >
                       {p.name}
                     </Link>
