@@ -319,7 +319,7 @@ const SaunaDetailPage = () => {
                   <p className="text-muted-foreground">Nog geen reviews. Wees de eerste!</p>
                 )}
                 <div className="mt-4">
-                  <ReviewForm saunaId={sauna.id} />
+                  <ReviewForm saunaId={sauna.id} saunaName={sauna.name} />
                 </div>
               </CardContent>
             </Card>

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { MapPin, Menu, ChevronDown, Star, Map } from "lucide-react";
+import { MapPin, Menu, ChevronDown, Star, Map, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import {
@@ -71,6 +71,15 @@ const Header = () => {
                 <Star className="h-4 w-4" /> Top 10
               </Link>
             </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <Link
+                to="/contact"
+                className="inline-flex h-10 items-center gap-1.5 justify-center rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+              >
+                <Mail className="h-4 w-4" /> Contact
+              </Link>
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
 
@@ -92,6 +101,9 @@ const Header = () => {
               </Link>
               <Link to="/de-beste-saunas-van-nederland" className="text-lg font-medium text-foreground hover:text-primary">
                 Top 10 Sauna's
+              </Link>
+              <Link to="/contact" className="text-lg font-medium text-foreground hover:text-primary">
+                Contact
               </Link>
               <div className="mt-2 border-t border-border pt-3">
                 <p className="mb-2 text-sm font-semibold text-muted-foreground uppercase tracking-wide">Provincies</p>
