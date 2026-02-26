@@ -56,15 +56,15 @@ Deno.serve(async (_req: Request) => {
     }
 
     for (const [slug, updated] of provinces) {
-      urls += `  <url>\n    <loc>${SITE}/sauna/${slug}</loc>\n    <lastmod>${updated.split("T")[0]}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
+      urls += `  <url>\n    <loc>${SITE}/saunas/${slug}</loc>\n    <lastmod>${updated.split("T")[0]}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
     }
 
     for (const [path, updated] of cities) {
-      urls += `  <url>\n    <loc>${SITE}/sauna/${path}</loc>\n    <lastmod>${updated.split("T")[0]}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
+      urls += `  <url>\n    <loc>${SITE}/saunas/${path}</loc>\n    <lastmod>${updated.split("T")[0]}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
     }
 
     for (const s of saunas || []) {
-      urls += `  <url>\n    <loc>${SITE}/sauna/${(s as any).provincie_slug}/${(s as any).plaatsnaam_slug}/${(s as any).slug}</loc>\n    <lastmod>${(s as any).updated_at.split("T")[0]}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n`;
+      urls += `  <url>\n    <loc>${SITE}/saunas/${(s as any).provincie_slug}/${(s as any).plaatsnaam_slug}/${(s as any).slug}</loc>\n    <lastmod>${(s as any).updated_at.split("T")[0]}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n`;
     }
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}</urlset>`;

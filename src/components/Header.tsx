@@ -46,7 +46,7 @@ const Header = () => {
                   {PROVINCES.map((p) => (
                     <Link
                       key={p.slug}
-                      to={`/sauna/${p.slug}`}
+                      to={`/saunas/${p.slug}`}
                       className="block rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                     >
                       {p.name}
@@ -113,7 +113,7 @@ const Header = () => {
                   {PROVINCES.map((p) => (
                     <Link
                       key={p.slug}
-                      to={`/sauna/${p.slug}`}
+                      to={`/saunas/${p.slug}`}
                       className="rounded-md px-2 py-1.5 text-sm text-foreground hover:text-primary hover:bg-accent"
                       onClick={() => setOpen(false)}
                     >

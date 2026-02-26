@@ -133,9 +133,9 @@ const SaunaDetailPage = () => {
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: "https://saunaboeken.com/" },
-        { "@type": "ListItem", position: 2, name: province?.name || provincie, item: `https://saunaboeken.com/sauna/${provincie}` },
-        { "@type": "ListItem", position: 3, name: sauna.plaatsnaam, item: `https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}` },
-        { "@type": "ListItem", position: 4, name: sauna.name, item: `https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}/${slug}` },
+        { "@type": "ListItem", position: 2, name: province?.name || provincie, item: `https://saunaboeken.com/saunas/${provincie}` },
+        { "@type": "ListItem", position: 3, name: sauna.plaatsnaam, item: `https://saunaboeken.com/saunas/${provincie}/${plaatsnaam}` },
+        { "@type": "ListItem", position: 4, name: sauna.name, item: `https://saunaboeken.com/saunas/${provincie}/${plaatsnaam}/${slug}` },
       ],
     },
     {
@@ -143,7 +143,7 @@ const SaunaDetailPage = () => {
       "@type": "HealthAndBeautyBusiness",
       name: sauna.name,
       description: sauna.description || `${sauna.name} is een sauna en wellness centrum in ${sauna.plaatsnaam}, ${sauna.provincie}. Boek nu je saunabezoek.`,
-      url: `https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}/${slug}`,
+      url: `https://saunaboeken.com/saunas/${provincie}/${plaatsnaam}/${slug}`,
       ...(sauna.website && { sameAs: sauna.website }),
       address: {
         "@type": "PostalAddress",
@@ -178,7 +178,7 @@ const SaunaDetailPage = () => {
       <SEOHead
         title={`${sauna.name} boeken — Sauna in ${sauna.plaatsnaam} | Saunaboeken.com`}
         description={sauna.description ? sauna.description.substring(0, 155) : `${sauna.name} boeken in ${sauna.plaatsnaam}, ${sauna.provincie}. Bekijk reviews, openingstijden, foto's en boek direct.`}
-        canonical={`https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}/${slug}`}
+        canonical={`https://saunaboeken.com/saunas/${provincie}/${plaatsnaam}/${slug}`}
         jsonLd={jsonLd}
       />
 
@@ -241,9 +241,9 @@ const SaunaDetailPage = () => {
         <nav className="mb-6 text-sm text-muted-foreground flex flex-wrap gap-1">
           <Link to="/" className="hover:text-primary">Home</Link>
           <span>/</span>
-          <Link to={`/sauna/${provincie}`} className="hover:text-primary">{province?.name || provincie}</Link>
+          <Link to={`/saunas/${provincie}`} className="hover:text-primary">{province?.name || provincie}</Link>
           <span>/</span>
-          <Link to={`/sauna/${provincie}/${plaatsnaam}`} className="hover:text-primary">{sauna.plaatsnaam}</Link>
+          <Link to={`/saunas/${provincie}/${plaatsnaam}`} className="hover:text-primary">{sauna.plaatsnaam}</Link>
           <span>/</span>
           <span className="text-foreground">{sauna.name}</span>
         </nav>
@@ -375,10 +375,10 @@ const SaunaDetailPage = () => {
                 <CardTitle className="font-serif text-lg">Ontdek meer</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Link to={`/sauna/${provincie}`} className="block text-sm text-muted-foreground hover:text-primary">
+                <Link to={`/saunas/${provincie}`} className="block text-sm text-muted-foreground hover:text-primary">
                   Sauna boeken in {province?.name || provincie}
                 </Link>
-                <Link to={`/sauna/${provincie}/${plaatsnaam}`} className="block text-sm text-muted-foreground hover:text-primary">
+                <Link to={`/saunas/${provincie}/${plaatsnaam}`} className="block text-sm text-muted-foreground hover:text-primary">
                   Alle sauna's in {sauna.plaatsnaam}
                 </Link>
                 <Link to="/de-beste-saunas-van-nederland" className="block text-sm text-muted-foreground hover:text-primary">
@@ -404,7 +404,7 @@ const SaunaDetailPage = () => {
             </p>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {displayNearby.map((nearby) => (
-                <Link key={nearby.id} to={`/sauna/${nearby.provincie_slug}/${nearby.plaatsnaam_slug}/${nearby.slug}`}>
+                <Link key={nearby.id} to={`/saunas/${nearby.provincie_slug}/${nearby.plaatsnaam_slug}/${nearby.slug}`}>
                   <Card className="group cursor-pointer overflow-hidden transition-all hover:shadow-lg h-full">
                     <div className="aspect-[16/10] bg-muted">
                       {nearby.photo_urls && nearby.photo_urls[0] ? (
@@ -458,11 +458,11 @@ const SaunaDetailPage = () => {
             </p>
             <p>
               Vergelijk {sauna.name} met andere sauna's in{" "}
-              <Link to={`/sauna/${provincie}/${plaatsnaam}`} className="text-primary hover:underline">
+               <Link to={`/saunas/${provincie}/${plaatsnaam}`} className="text-primary hover:underline">
                 {sauna.plaatsnaam}
               </Link>{" "}
               en{" "}
-              <Link to={`/sauna/${provincie}`} className="text-primary hover:underline">
+              <Link to={`/saunas/${provincie}`} className="text-primary hover:underline">
                 {province?.name || provincie}
               </Link>
               . Bekijk reviews van andere bezoekers en boek direct de sauna die bij jou past.

@@ -93,7 +93,7 @@ const SaunaMap = ({ saunas, height = "400px", className = "" }: SaunaMapProps) =
           <p style="font-weight:600;font-size:14px;margin:0 0 4px">${sauna.name}</p>
           <p style="font-size:12px;color:#666;margin:0 0 4px">${sauna.plaatsnaam}</p>
           ${ratingHtml}
-          <a href="/sauna/${sauna.provincie_slug}/${sauna.plaatsnaam_slug}/${sauna.slug}" style="font-size:12px;color:hsl(174,60%,40%)">Bekijk details →</a>
+          <a href="/saunas/${sauna.provincie_slug}/${sauna.plaatsnaam_slug}/${sauna.slug}" style="font-size:12px;color:hsl(174,60%,40%)">Bekijk details →</a>
         </div>
       `;
 

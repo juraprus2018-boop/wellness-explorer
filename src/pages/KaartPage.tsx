@@ -90,7 +90,7 @@ const KaartPage = () => {
           {PROVINCES.map((p) => (
             <Link
               key={p.slug}
-              to={`/sauna/${p.slug}`}
+              to={`/saunas/${p.slug}`}
               className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
             >
               {p.name}

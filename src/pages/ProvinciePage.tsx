@@ -66,12 +66,12 @@ const ProvinciePage = () => {
     "@type": "CollectionPage",
     name: `Sauna's in ${province.name}`,
     description: `Overzicht van alle ${totalSaunas} sauna's en wellness centra in de provincie ${province.name}.`,
-    url: `https://saunaboeken.com/sauna/${provincie}`,
+    url: `https://saunaboeken.com/saunas/${provincie}`,
     breadcrumb: {
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: "https://saunaboeken.com/" },
-        { "@type": "ListItem", position: 2, name: province.name, item: `https://saunaboeken.com/sauna/${provincie}` },
+        { "@type": "ListItem", position: 2, name: province.name, item: `https://saunaboeken.com/saunas/${provincie}` },
       ],
     },
   };
@@ -83,7 +83,7 @@ const ProvinciePage = () => {
       <SEOHead
         title={`Sauna boeken ${province.name} — Vind & boek een sauna | Saunaboeken.com`}
         description={`Sauna boeken in ${province.name}? Bekijk ${totalSaunas > 0 ? totalSaunas + " " : ""}sauna's en wellness centra. Vergelijk reviews, openingstijden en boek direct jouw sauna.`}
-        canonical={`https://saunaboeken.com/sauna/${provincie}`}
+        canonical={`https://saunaboeken.com/saunas/${provincie}`}
         jsonLd={jsonLd}
       />
 
@@ -116,7 +116,7 @@ const ProvinciePage = () => {
           <h2 className="mb-4 font-serif text-xl font-semibold">Sauna boeken per plaats in {province.name}</h2>
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             {plaatsen.map((plaats) => (
-              <Link key={plaats.slug} to={`/sauna/${provincie}/${plaats.slug}`}>
+              <Link key={plaats.slug} to={`/saunas/${provincie}/${plaats.slug}`}>
                 <Card className="group cursor-pointer transition-all hover:shadow-lg hover:border-primary/30">
                   <CardContent className="flex items-center justify-between p-5">
                     <div className="flex items-center gap-3">
@@ -151,7 +151,7 @@ const ProvinciePage = () => {
           {otherProvinces.map((p) => (
             <Link
               key={p.slug}
-              to={`/sauna/${p.slug}`}
+              to={`/saunas/${p.slug}`}
               className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
             >
               Sauna boeken {p.name}
