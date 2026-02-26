@@ -115,7 +115,7 @@ const Index = () => {
         </p>
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {filteredProvinces.map((province) => (
-            <Link key={province.slug} to={`/sauna/${province.slug}`}>
+            <Link key={province.slug} to={`/saunas/${province.slug}`}>
               <Card className="group cursor-pointer transition-all hover:shadow-lg hover:border-primary/30">
                 <CardContent className="flex items-center justify-between p-5">
                   <div className="flex items-center gap-3">
@@ -146,7 +146,7 @@ const Index = () => {
           <p className="mb-10 text-center text-muted-foreground">De best beoordeelde sauna's die je nu kunt boeken</p>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {topSaunas.map((sauna) => (
-              <Link key={sauna.id} to={`/sauna/${sauna.provincie_slug}/${sauna.plaatsnaam_slug}/${sauna.slug}`}>
+              <Link key={sauna.id} to={`/saunas/${sauna.provincie_slug}/${sauna.plaatsnaam_slug}/${sauna.slug}`}>
                 <Card className="group cursor-pointer overflow-hidden transition-all hover:shadow-lg">
                   <div className="aspect-[4/3] bg-muted">
                     {sauna.photo_urls && sauna.photo_urls[0] ? (
@@ -212,9 +212,9 @@ const Index = () => {
           <h2 className="font-serif text-2xl font-bold text-foreground">Sauna boeken in Nederland — Zo werkt het</h2>
           <p>
             Wil je een sauna boeken? Op Saunaboeken.com vind je het complete aanbod van sauna's en wellness centra in heel Nederland. Of je nu een sauna wilt boeken in{" "}
-            <Link to="/sauna/noord-holland" className="text-primary hover:underline">Noord-Holland</Link>, een dagje wellness wilt boeken in{" "}
-            <Link to="/sauna/gelderland" className="text-primary hover:underline">Gelderland</Link> of een sauna zoekt in{" "}
-            <Link to="/sauna/limburg" className="text-primary hover:underline">Limburg</Link> — hier vind je alle informatie om de juiste keuze te maken.
+            <Link to="/saunas/noord-holland" className="text-primary hover:underline">Noord-Holland</Link>, een dagje wellness wilt boeken in{" "}
+            <Link to="/saunas/gelderland" className="text-primary hover:underline">Gelderland</Link> of een sauna zoekt in{" "}
+            <Link to="/saunas/limburg" className="text-primary hover:underline">Limburg</Link> — hier vind je alle informatie om de juiste keuze te maken.
           </p>
           <p>
             Vergelijk sauna's op prijs, reviews en faciliteiten. Bekijk openingstijden en foto's, en boek direct via de website van de sauna. Gebruik onze{" "}

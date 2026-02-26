@@ -38,9 +38,9 @@ const App = () => (
             {/* Public routes with header/footer */}
             <Route element={<Layout />}>
               <Route path="/" element={<Index />} />
-              <Route path="/sauna/:provincie" element={<ProvinciePage />} />
-              <Route path="/sauna/:provincie/:plaatsnaam" element={<PlaatsPage />} />
-              <Route path="/sauna/:provincie/:plaatsnaam/:slug" element={<SaunaDetailPage />} />
+              <Route path="/saunas/:provincie" element={<ProvinciePage />} />
+              <Route path="/saunas/:provincie/:plaatsnaam" element={<PlaatsPage />} />
+              <Route path="/saunas/:provincie/:plaatsnaam/:slug" element={<SaunaDetailPage />} />
               <Route path="/de-beste-saunas-van-nederland" element={<Top10Page />} />
               <Route path="/kaart" element={<KaartPage />} />
               <Route path="/contact" element={<ContactPage />} />

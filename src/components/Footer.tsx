@@ -21,7 +21,7 @@ const Footer = () => (
             {PROVINCES.map((p) => (
               <Link
                 key={p.slug}
-                to={`/sauna/${p.slug}`}
+                to={`/saunas/${p.slug}`}
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 {p.name}
@@ -41,13 +41,13 @@ const Footer = () => (
           </div>
           <h4 className="font-serif font-semibold mb-3 mt-6">Populaire steden</h4>
           <div className="flex flex-col gap-1">
-            <Link to="/sauna/noord-holland/amsterdam" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            <Link to="/saunas/noord-holland/amsterdam" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               Sauna boeken Amsterdam
             </Link>
-            <Link to="/sauna/zuid-holland/rotterdam" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            <Link to="/saunas/zuid-holland/rotterdam" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               Sauna boeken Rotterdam
             </Link>
-            <Link to="/sauna/utrecht/utrecht" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            <Link to="/saunas/utrecht/utrecht" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               Sauna boeken Utrecht
             </Link>
           </div>

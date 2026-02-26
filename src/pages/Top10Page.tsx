@@ -40,7 +40,7 @@ const Top10Page = () => {
             "@type": "ListItem",
             position: s.top10_position,
             name: s.name,
-            url: `https://saunaboeken.com/sauna/${s.provincie_slug}/${s.plaatsnaam_slug}/${s.slug}`,
+            url: `https://saunaboeken.com/saunas/${s.provincie_slug}/${s.plaatsnaam_slug}/${s.slug}`,
           })),
         }]
       : []),
@@ -79,7 +79,7 @@ const Top10Page = () => {
         <div className="space-y-4">
           {top10.map((sauna, i) => (
             <div key={sauna.id}>
-              <Link to={`/sauna/${sauna.provincie_slug}/${sauna.plaatsnaam_slug}/${sauna.slug}`}>
+              <Link to={`/saunas/${sauna.provincie_slug}/${sauna.plaatsnaam_slug}/${sauna.slug}`}>
                 <Card className="transition-all hover:shadow-lg">
                   <CardContent className="flex items-center gap-4 p-4 md:p-6">
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 font-serif text-xl font-bold text-primary">
@@ -127,9 +127,9 @@ const Top10Page = () => {
           De ranglijst is gebaseerd op het gemiddelde van alle beoordelingen door bezoekers. We nemen alleen sauna's op die voldoende reviews hebben ontvangen om een betrouwbaar beeld te geven.
         </p>
         <p>
-          Bekijk ook sauna's per provincie, zoals in <Link to="/sauna/noord-brabant" className="text-primary hover:underline">Noord-Brabant</Link>,{" "}
-          <Link to="/sauna/utrecht" className="text-primary hover:underline">Utrecht</Link> of{" "}
-          <Link to="/sauna/zuid-holland" className="text-primary hover:underline">Zuid-Holland</Link>. Of gebruik de{" "}
+          Bekijk ook sauna's per provincie, zoals in <Link to="/saunas/noord-brabant" className="text-primary hover:underline">Noord-Brabant</Link>,{" "}
+          <Link to="/saunas/utrecht" className="text-primary hover:underline">Utrecht</Link> of{" "}
+          <Link to="/saunas/zuid-holland" className="text-primary hover:underline">Zuid-Holland</Link>. Of gebruik de{" "}
           <Link to="/kaart" className="text-primary hover:underline">interactieve kaart</Link> om sauna's bij jou in de buurt te vinden.
         </p>
       </section>

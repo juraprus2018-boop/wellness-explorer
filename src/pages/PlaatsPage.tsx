@@ -96,8 +96,8 @@ const PlaatsPage = () => {
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: "https://saunaboeken.com/" },
-        { "@type": "ListItem", position: 2, name: province?.name || provincie, item: `https://saunaboeken.com/sauna/${provincie}` },
-        { "@type": "ListItem", position: 3, name: displayPlaats, item: `https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}` },
+        { "@type": "ListItem", position: 2, name: province?.name || provincie, item: `https://saunaboeken.com/saunas/${provincie}` },
+        { "@type": "ListItem", position: 3, name: displayPlaats, item: `https://saunaboeken.com/saunas/${provincie}/${plaatsnaam}` },
       ],
     },
     ...(saunas && saunas.length > 0
@@ -110,7 +110,7 @@ const PlaatsPage = () => {
             "@type": "ListItem",
             position: i + 1,
             name: s.name,
-            url: `https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}/${s.slug}`,
+            url: `https://saunaboeken.com/saunas/${provincie}/${plaatsnaam}/${s.slug}`,
           })),
         }]
       : []),
@@ -133,14 +133,14 @@ const PlaatsPage = () => {
       <SEOHead
         title={`Sauna boeken ${displayPlaats} — De beste sauna's | Saunaboeken.com`}
         description={`Sauna boeken in ${displayPlaats}? Ontdek alle ${saunas?.length || ""} sauna's en wellness centra. Vergelijk reviews, foto's en boek direct jouw sauna in ${displayPlaats}, ${province?.name || provincie}.`}
-        canonical={`https://saunaboeken.com/sauna/${provincie}/${plaatsnaam}`}
+        canonical={`https://saunaboeken.com/saunas/${provincie}/${plaatsnaam}`}
         jsonLd={jsonLd}
       />
 
       <nav className="mb-6 text-sm text-muted-foreground">
         <Link to="/" className="hover:text-primary">Home</Link>
         <span className="mx-2">/</span>
-        <Link to={`/sauna/${provincie}`} className="hover:text-primary">{province?.name || provincie}</Link>
+        <Link to={`/saunas/${provincie}`} className="hover:text-primary">{province?.name || provincie}</Link>
         <span className="mx-2">/</span>
         <span className="text-foreground">{displayPlaats}</span>
       </nav>
@@ -212,7 +212,7 @@ const PlaatsPage = () => {
       ) : saunas && saunas.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {saunas.map((sauna) => (
-            <Link key={sauna.id} to={`/sauna/${provincie}/${plaatsnaam}/${sauna.slug}`}>
+            <Link key={sauna.id} to={`/saunas/${provincie}/${plaatsnaam}/${sauna.slug}`}>
               <Card className="group cursor-pointer overflow-hidden transition-all hover:shadow-lg h-full">
                 <div className="aspect-[4/3] bg-muted">
                   {sauna.photo_urls && sauna.photo_urls[0] ? (
@@ -273,7 +273,7 @@ const PlaatsPage = () => {
             {otherCities.slice(0, 20).map((city) => (
               <Link
                 key={city.plaatsnaam_slug}
-                to={`/sauna/${provincie}/${city.plaatsnaam_slug}`}
+                to={`/saunas/${provincie}/${city.plaatsnaam_slug}`}
                 className="rounded-full border border-border px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
               >
                 {city.plaatsnaam}
@@ -285,7 +285,7 @@ const PlaatsPage = () => {
 
       {/* Link back to province */}
       <div className="mt-10 border-t border-border pt-6">
-        <Link to={`/sauna/${provincie}`} className="text-sm text-primary hover:underline">
+        <Link to={`/saunas/${provincie}`} className="text-sm text-primary hover:underline">
           ← Bekijk alle sauna's in {province?.name || provincie}
         </Link>
       </div>
@@ -301,8 +301,8 @@ const PlaatsPage = () => {
         </p>
         <p>
           Via Saunaboeken.com vergelijk je eenvoudig alle sauna's in{" "}
-          <Link to={`/sauna/${provincie}/${plaatsnaam}`} className="text-primary hover:underline">{displayPlaats}</Link> en de rest van{" "}
-          <Link to={`/sauna/${provincie}`} className="text-primary hover:underline">{province?.name || provincie}</Link>. 
+          <Link to={`/saunas/${provincie}/${plaatsnaam}`} className="text-primary hover:underline">{displayPlaats}</Link> en de rest van{" "}
+          <Link to={`/saunas/${provincie}`} className="text-primary hover:underline">{province?.name || provincie}</Link>. 
           Bekijk ook onze{" "}
           <Link to="/de-beste-saunas-van-nederland" className="text-primary hover:underline">Top 10 beste sauna's van Nederland</Link> 
           {" "}of gebruik de{" "}
